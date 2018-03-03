@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  HealthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: health-check.handler
+      Runtime: nodejs6.10
+      CodeUri: ./
+      FunctionName: HealthCheckFunction
+      Events:
+        GetResource:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: get
