@@ -1,0 +1,347 @@
+{
+  "collection": {
+    "_": {
+      "postman_id": "0dd7b2e7-592f-7534-a59a-bfdca77dd1b7"
+    },
+    "description": {
+      "content": "",
+      "type": "text/plain"
+    },
+    "item": [
+      {
+        "id": "43a6b790-cdee-4c9d-b1e1-cb8327ad1259",
+        "name": "health-endpoint",
+        "request": {
+          "description": {
+            "content": "",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "https",
+            "path": [
+              "Prod",
+              "health"
+            ],
+            "host": [
+              "w9xlq6bvh0",
+              "execute-api",
+              "us-east-1",
+              "amazonaws",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "method": "GET",
+          "body": {}
+        },
+        "response": [],
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "id": "126624df-186f-402c-b3de-807e5c5dcc13",
+              "type": "text/javascript",
+              "exec": [
+                "pm.test(\"Status code is 200\", function () {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "",
+                "var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
+                " ",
+                "tests[\"Has Content-Type\"] = contentTypeHeaderExists;"
+              ],
+              "_lastExecutionId": "a63f4c60-2411-429b-bca9-e7ae4418c551"
+            }
+          }
+        ]
+      }
+    ],
+    "event": [],
+    "variable": [],
+    "info": {
+      "id": "0dd7b2e7-592f-7534-a59a-bfdca77dd1b7",
+      "name": "NewmanAPI",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    }
+  },
+  "environment": {
+    "id": "82c2a324-87cd-4a55-b63c-54420e15d479",
+    "values": []
+  },
+  "globals": {
+    "id": "678a2e9b-a07c-494c-a5ee-bd95607f858d",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 2,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 163,
+      "started": 1520346318136,
+      "completed": 1520346318363
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 1,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "c5b11aa7-44b9-47a0-8710-63647eb5e271",
+          "httpRequestId": "6dfaf052-4171-4758-b24c-25cc5ac59073"
+        },
+        "item": {
+          "id": "43a6b790-cdee-4c9d-b1e1-cb8327ad1259",
+          "name": "health-endpoint",
+          "request": {
+            "description": {
+              "content": "",
+              "type": "text/plain"
+            },
+            "url": {
+              "protocol": "https",
+              "path": [
+                "Prod",
+                "health"
+              ],
+              "host": [
+                "w9xlq6bvh0",
+                "execute-api",
+                "us-east-1",
+                "amazonaws",
+                "com"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET",
+            "body": {}
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "126624df-186f-402c-b3de-807e5c5dcc13",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
+                  " ",
+                  "tests[\"Has Content-Type\"] = contentTypeHeaderExists;"
+                ],
+                "_lastExecutionId": "a63f4c60-2411-429b-bca9-e7ae4418c551"
+              }
+            }
+          ]
+        },
+        "request": {
+          "description": {
+            "content": "",
+            "type": "text/plain"
+          },
+          "url": {
+            "protocol": "https",
+            "path": [
+              "Prod",
+              "health"
+            ],
+            "host": [
+              "w9xlq6bvh0",
+              "execute-api",
+              "us-east-1",
+              "amazonaws",
+              "com"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.1.3"
+            },
+            {
+              "key": "Accept",
+              "value": "*/*"
+            },
+            {
+              "key": "Host",
+              "value": "w9xlq6bvh0.execute-api.us-east-1.amazonaws.com"
+            },
+            {
+              "key": "accept-encoding",
+              "value": "gzip, deflate"
+            }
+          ],
+          "method": "GET",
+          "body": {}
+        },
+        "response": {
+          "id": "86fb6c8e-df3b-4060-bbf6-73cc645f3068",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Content-Length",
+              "value": "38"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 06 Mar 2018 14:25:16 GMT"
+            },
+            {
+              "key": "x-amzn-RequestId",
+              "value": "30a9c8e0-214a-11e8-b2b9-ad35add4c091"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "X-Amzn-Trace-Id",
+              "value": "sampled=0;root=1-5a9ea4cc-ffbf9a65979c7b36689d39ed"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "X-Cache",
+              "value": "Miss from cloudfront"
+            },
+            {
+              "key": "Via",
+              "value": "1.1 274469ea4a9ada6e05630e17982ca5de.cloudfront.net (CloudFront)"
+            },
+            {
+              "key": "X-Amz-Cf-Id",
+              "value": "Sc0VSiTpDst0IQx0kGqEwlBPCKRFGIJtQDiKvaapUwQd-DtnJbam1w=="
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              83,
+              117,
+              99,
+              99,
+              101,
+              115,
+              115,
+              102,
+              117,
+              108,
+              32,
+              114,
+              101,
+              115,
+              112,
+              111,
+              110,
+              115,
+              101,
+              32,
+              118,
+              50,
+              46,
+              49,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 163,
+          "responseSize": 38
+        },
+        "id": "43a6b790-cdee-4c9d-b1e1-cb8327ad1259",
+        "assertions": [
+          {
+            "assertion": "Status code is 200"
+          },
+          {
+            "assertion": "Has Content-Type"
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 38
+    },
+    "failures": [],
+    "error": null
+  }
+}

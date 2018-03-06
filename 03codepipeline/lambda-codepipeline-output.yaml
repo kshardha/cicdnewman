@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  LambdaNewmanCodePipeLineFunction:
+    Properties:
+      CodeUri: s3://mb-root-dev/cicdnewman/027aab2d44acaf77d2404d6d0da9ec50
+      FunctionName: LambdaNewmanCodePipeLineFunction
+      Handler: newman-pipeline.handler
+      Runtime: nodejs6.10
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31
