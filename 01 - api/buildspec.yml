@@ -2,10 +2,11 @@ version: 0.2
 phases:
   install:
     commands:
+      - cd '01 - api'
       - aws cloudformation package --template-file api.yaml
                                    --s3-bucket mb-root-dev
                                    --output-template-file api-output.yaml
 artifacts:
   type: zip
   files:
-    - api-output.yaml
+    - '01 - api/api-output.yaml'
