@@ -3,10 +3,11 @@ phases:
   install:
     commands:
       - cd 01api
-      - aws cloudformation package --template-file api.yaml
-                                   --s3-bucket mb-root-dev
-                                   --output-template-file api-output.yaml
+      - aws cloudformation package --template-file postman-newman-api-stack.yaml
+                                   --s3-bucket postman-newman
+                                   --s3-prefix apistack
+                                   --output-template-file postman-newman-api-stack-output.yaml
 artifacts:
   type: zip
   files:
-    - 01api/api-output.yaml
+    - 01api/postman-newman-api-stack-output.yaml

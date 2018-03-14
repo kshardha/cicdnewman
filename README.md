@@ -1,7 +1,7 @@
 # About
 
 This post will demonstrate use of code pipeline to build, deploy and functionally test an API. The testing will conduct 
-functional test suite using a postman collection against our api using the Newman, a command line collection runner that 
+functional test suite using a postman collection against our api using Newman, a command line collection runner that 
 can also be invoked programmatically via node js.
 
 Why: proliferation of API's is obvious and the need to include functional testing of API's in the devops lifecycle is is a common 
@@ -12,16 +12,16 @@ customer ask.
 
 aws cloudformation package \
 --region us-east-1 \
---template-file api.yaml \
---s3-bucket mb-root-dev \
---s3-prefix cicdnewman \
---output-template-file api-output.yaml
+--template-file postman-newman-api-stack.yaml \
+--s3-bucket postman-newman \
+--s3-prefix apistack \
+--output-template-file postman-newman-api-stack-output.yaml
     
    
 aws cloudformation deploy \
 --region us-east-1 \
---template-file api-output.yaml \
---stack-name cicd-newman-stack \
+--template-file postman-newman-api-stack-output.yaml \
+--stack-name postman-newman-api-stack \
 --capabilities CAPABILITY_IAM 
 
 
