@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   HealthFunction:
     Properties:
-      CodeUri: s3://mb-root-dev/cicdnewman/4db3118f567a0fea2b106b056f3290af
+      CodeUri: s3://mb-root-dev/cicdnewman/8658a3ae43004659865bbbff478d8c5d
       Events:
         GetResource:
           Properties:

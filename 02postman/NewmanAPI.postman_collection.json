@@ -1,7 +1,7 @@
 {
 	"info": {
 		"name": "NewmanAPI",
-		"_postman_id": "0dd7b2e7-592f-7534-a59a-bfdca77dd1b7",
+		"_postman_id": "c68550ac-8585-40d8-87e7-78596739f3b3",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -29,12 +29,15 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "https://w9xlq6bvh0.execute-api.us-east-1.amazonaws.com/Prod/health",
+					"raw": "https://95v7vftv1a.execute-api.us-east-1.amazonaws.com/Prod/health",
 					"protocol": "https",
 					"host": [
-						"w9xlq6bvh0",
+						"95v7vftv1a",
 						"execute-api",
 						"us-east-1",
 						"amazonaws",
@@ -45,7 +48,7 @@
 						"health"
 					]
 				},
-				"description": ""
+				"description": null
 			},
 			"response": []
 		}
