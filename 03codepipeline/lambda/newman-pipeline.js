@@ -5,6 +5,11 @@ let s3 = new AWS.S3({apiVersion: '2006-03-01'});
 let fs = require('fs');
 
 /**
+ * TODO: use env variables
+ * TODO: reduce package size
+ * TODO: handle failure
+ */
+/**
  *
  * @param event
  * @param context
@@ -56,7 +61,7 @@ exports.handler = function(event, context) {
         console.log(' >>>>> fetching collection');
 
         let params = {
-            Bucket: 'postmancollections',
+            Bucket: 'postman-newman',
             Key: 'NewmanAPI.postman_collection.json'
         };
 
@@ -131,8 +136,8 @@ exports.handler = function(event, context) {
             let base64data = new Buffer(data, 'binary');
 
             s3.putObject({
-                Bucket: 'postmancollections',
-                Key: 'output.json',
+                Bucket: 'postman-newman',
+                Key: 'test-results/output.json',
                 Body: base64data,
                 ACL: 'public-read'
             },function (resp) {

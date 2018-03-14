@@ -47,15 +47,15 @@ The function:
 
 aws cloudformation package \
 --region us-east-1 \
---template-file lambda-codepipeline.yaml \
---s3-bucket mb-root-dev \
---s3-prefix newman-lambda \
---output-template-file lambda-codepipeline-output.yaml
+--template-file lambda-newman-tester.yaml \
+--s3-bucket postman-newman \
+--s3-prefix lambda-newman \
+--output-template-file lambda-newman-tester-output.yaml
     
    
 aws cloudformation deploy \
 --region us-east-1 \
---template-file lambda-codepipeline-output.yaml \
+--template-file lambda-newman-tester-output.yaml \
 --stack-name newman-lambda-function \
 --capabilities CAPABILITY_IAM 
 
@@ -69,48 +69,6 @@ TODO
 
 
 # 07 TODO: single page app to list reports
-
- 
-
-
-
-#### Required IAM Permissions
-
-- write to S3 bucket
-- codepipeline:PutJobSuccessResult
-
-
-#### Package Deploy
-
-aws cloudformation package \
---region us-east-1 \
---template-file lambda-codepipeline.yaml \
---s3-bucket mb-root-dev \
---s3-prefix cicdnewman \
---output-template-file lambda-codepipeline-output.yaml
-    
-   
-aws cloudformation deploy \
---region us-east-1 \
---template-file lambda-codepipeline-output.yaml \
---stack-name lambda-codepipeline \
---capabilities CAPABILITY_IAM 
-
-
-#### TODO
-
-- reduce deployment size
-- 
-
-
-# 05 - record and report results
-
-
-
-# TODO
-
-
-- [ ] doc cleanup
     
 
 # References

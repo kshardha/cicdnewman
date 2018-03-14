@@ -34,10 +34,10 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://0nyt2aj2l5.execute-api.us-east-1.amazonaws.com/Prod/health",
+					"raw": "https://k7reyeo63l.execute-api.us-east-1.amazonaws.com/Prod/health",
 					"protocol": "https",
 					"host": [
-						"0nyt2aj2l5",
+						"k7reyeo63l",
 						"execute-api",
 						"us-east-1",
 						"amazonaws",

@@ -15,7 +15,7 @@ let fs = require('fs');
 let getCollection = function(callback){
 
     let params = {
-        Bucket: 'postmancollections',
+        Bucket: 'postman-newman',
         Key: 'NewmanAPI.postman_collection.json'
     };
 
@@ -75,8 +75,8 @@ let publishResults = function(callback){
         let base64data = new Buffer(data, 'binary');
 
         s3.putObject({
-            Bucket: 'postmancollections',
-            Key: 'output.json',
+            Bucket: 'postman-newman',
+            Key: 'test-results/output.json',
             Body: base64data,
             ACL: 'public-read'
         },function (resp) {
