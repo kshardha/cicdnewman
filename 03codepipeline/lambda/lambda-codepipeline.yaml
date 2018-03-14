@@ -6,4 +6,5 @@ Resources:
     Properties:
       Handler: newman-pipeline.handler
       Runtime: nodejs6.10
+      Timeout: 60
       FunctionName: LambdaNewmanCodePipeLineFunction

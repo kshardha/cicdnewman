@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   LambdaNewmanCodePipeLineFunction:
     Properties:
-      CodeUri: s3://mb-root-dev/cicdnewman/027aab2d44acaf77d2404d6d0da9ec50
+      CodeUri: s3://mb-root-dev/cicdnewman/7cc096f1449cff468e4a50c92444fc9e
       FunctionName: LambdaNewmanCodePipeLineFunction
       Handler: newman-pipeline.handler
       Runtime: nodejs6.10

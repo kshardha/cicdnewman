@@ -1,7 +1,11 @@
 # About
 
-Demonstrate use of code pipeline to build, deploy and test an API. The testing will conduct functional test suite against
-our api using Postman collections and the Newman cli testing tool.
+This post will demonstrate use of code pipeline to build, deploy and functionally test an API. The testing will conduct 
+functional test suite using a postman collection against our api using the Newman, a command line collection runner that 
+can also be invoked programmatically via node js.
+
+Why: proliferation of API's is obvious and the need to include functional testing of API's in the devops lifecycle is is a common 
+customer ask. 
 
 
 # 01 - api creation deployment
@@ -24,18 +28,51 @@ aws cloudformation deploy \
 # 02 - use postman to test your api
 
 
+
 # 03 - automate api deployment with code pipeline
 
+Pipeline currently setup manually via AWS console. 
+TODO: cloud formation
 
-# 04 - add automated functional testing to pipeline with 
+
+# 04 - add automated functional testing to pipeline 
 
 This is the lambda function responsible for executing a postman collection. 
 
 The function:
 - grabs the collection from an S3 bucket
 - runs the test and places results first in lambda's /tmp folder
-- publishes results to s3 bucket
-- 
+- TODO: normalize/cleanse output to make it easier to read with athena
+- publishes cleansed results to s3 bucket
+
+aws cloudformation package \
+--region us-east-1 \
+--template-file lambda-codepipeline.yaml \
+--s3-bucket mb-root-dev \
+--s3-prefix newman-lambda \
+--output-template-file lambda-codepipeline-output.yaml
+    
+   
+aws cloudformation deploy \
+--region us-east-1 \
+--template-file lambda-codepipeline-output.yaml \
+--stack-name newman-lambda-function \
+--capabilities CAPABILITY_IAM 
+
+TODO
+- [ ] more api endpoints, e.g. secured via cognito user pool, secured via sigv4, custom transformation, oauth, etc.
+
+# 05 TODO: Using athena to query test results
+
+
+# 06 TODO: Using quick sight to visualize test results.
+
+
+# 07 TODO: single page app to list reports
+
+ 
+
+
 
 #### Required IAM Permissions
 
@@ -72,8 +109,8 @@ aws cloudformation deploy \
 
 # TODO
 
-- [ ] more api endpoints, e.g. secured via cognito user pool, secured via sigv4, custom transformation, etc.
-- [ ] 
+
+- [ ] doc cleanup
     
 
 # References
