@@ -12,16 +12,20 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "126624df-186f-402c-b3de-807e5c5dcc13",
+						"id": "4cbe8130-f76c-4a48-8bcf-4a4aad5fce4e",
 						"type": "text/javascript",
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
 							"});",
 							"",
 							"var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
 							" ",
-							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;"
+							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"v2.5\");",
+							"});"
 						]
 					}
 				}
