@@ -1,8 +1,7 @@
 {
 	"info": {
-		"name": "NewmanAPI",
 		"_postman_id": "c68550ac-8585-40d8-87e7-78596739f3b3",
-		"description": "",
+		"name": "NewmanAPI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -12,11 +11,11 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "4cbe8130-f76c-4a48-8bcf-4a4aad5fce4e",
+						"id": "0e33f567-35c3-4f51-85c1-56b04cf2b676",
 						"type": "text/javascript",
 						"exec": [
-							"pm.test(\"Status code is 400\", function () {",
-							"    pm.response.to.have.status(400);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
 							"});",
 							"",
 							"var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
@@ -38,21 +37,54 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "https://k7reyeo63l.execute-api.us-east-1.amazonaws.com/Prod/health",
-					"protocol": "https",
+					"raw": "{{apigw-root}}/health",
 					"host": [
-						"k7reyeo63l",
-						"execute-api",
-						"us-east-1",
-						"amazonaws",
-						"com"
+						"{{apigw-root}}"
 					],
 					"path": [
-						"Prod",
 						"health"
 					]
-				},
-				"description": null
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "second function",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e960807b-f4df-4532-819e-1d2c50625b2e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
+							" ",
+							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"v2.5\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "{{apigw-root}}/two",
+					"host": [
+						"{{apigw-root}}"
+					],
+					"path": [
+						"two"
+					]
+				}
 			},
 			"response": []
 		}

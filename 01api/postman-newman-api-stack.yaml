@@ -14,3 +14,16 @@ Resources:
           Properties:
             Path: /health
             Method: get
+  FunctionTwo:
+      Type: AWS::Serverless::Function
+      Properties:
+        Handler: function-two.handler
+        Runtime: nodejs6.10
+        CodeUri: ./
+        FunctionName: FunctionTwo
+        Events:
+          GetResource:
+            Type: Api
+            Properties:
+              Path: /two
+              Method: get

@@ -27,7 +27,13 @@ aws cloudformation deploy \
 
 # 02 - use postman to test your api
 
+Via the postman client
 
+Via the CLI
+
+newman run NewmanAPI.postman_collection.json \
+--environment newman-postman-environment.postman_environment.json \
+-r cli,json,html 
 
 # 03 - automate api deployment with code pipeline
 
@@ -63,6 +69,17 @@ TODO
 - [ ] more api endpoints, e.g. secured via cognito user pool, secured via sigv4, custom transformation, oauth, etc.
 
 # 05 TODO: Using athena to query test results
+
+CREATE EXTERNAL TABLE IF NOT EXISTS mb_athena.newman (
+  `total` int,
+  `pending` int,
+  `failed` int 
+)
+ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
+WITH SERDEPROPERTIES (
+  'serialization.format' = '1'
+) LOCATION 's3://newmon-json-test/'
+TBLPROPERTIES ('has_encrypted_data'='false');
 
 
 # 06 TODO: Using quick sight to visualize test results.
