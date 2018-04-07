@@ -1,14 +1,16 @@
 # About
 
-This post will demonstrate use of code pipeline to build, deploy and functionally test an API. The testing will conduct 
-functional test suite using a postman collection against our api using Newman, a command line collection runner that 
-can also be invoked programmatically via node js.
+This post will demonstrate use of code pipeline to build, deploy and functionally
+test an API. The testing will conduct functional test suite using a postman
+collection against our api using Newman, a command line collection runner that can
+also be invoked programmatically via node js.
 
-Why: proliferation of API's is obvious and the need to include functional testing of API's in the devops lifecycle is is a common 
-customer ask. 
-
+Why: proliferation of API's is obvious and the need to include functional testing
+of API's in the devops lifecycle is is a common customer ask.
 
 # 01 - api creation deployment
+
+First we will deploy a simple api and demonstrate how to test using Postman
 
 aws cloudformation package \
 --region us-east-1 \
@@ -16,20 +18,21 @@ aws cloudformation package \
 --s3-bucket postman-newman \
 --s3-prefix apistack \
 --output-template-file postman-newman-api-stack-output.yaml
-    
    
 aws cloudformation deploy \
 --region us-east-1 \
 --template-file postman-newman-api-stack-output.yaml \
 --stack-name postman-newman-api-stack \
---capabilities CAPABILITY_IAM 
+--capabilities CAPABILITY_IAM
 
+# 02 - use postman to test your api via the client and cli
 
-# 02 - use postman to test your api
+- Via the postman client
+-- create an environment and update postman with your api gateway url.
+-- create 3 separate tests for each endpoint.
+-- export both your postman collection and your environment so you can run via cli.
 
-Via the postman client
-
-Via the CLI
+- Via the CLI
 
 newman run NewmanAPI.postman_collection.json \
 --environment newman-postman-environment.postman_environment.json \
@@ -37,49 +40,61 @@ newman run NewmanAPI.postman_collection.json \
 
 # 03 - automate api deployment with code pipeline
 
-Pipeline currently setup manually via AWS console. 
-TODO: cloud formation
+This section demonstrates how to execute api gateway deployments using code pipeline.
+In the next section we will automate postman collection testing.
+
+- Manual Setup
+
+- Cloud Formation setup
 
 
-# 04 - add automated functional testing to pipeline 
+TODO: Pipeline currently setup manually via AWS console - create via cloud formation
+TODO: Apply granular permissions according to least priv.
 
-This is the lambda function responsible for executing a postman collection. 
+
+# 04 - add automated postman collection testing to pipeline
+This section demonstrates how to add lambda function to run postman collections
+via code pipeline stage.
+
+
+This is the lambda function responsible for executing a postman collection. We
+need to deploy it first before we can add it to a stage in code pipeline
+
+This lambda function needs permissions that
+- allow read access to S3 bucket to get postman collection and environment files
+- allow write access to S3 bucket in order to store test results
+- allow access to code pipeline so it can acknowledge successful execution to codepipeline
 
 The function:
-- grabs the collection from an S3 bucket
+- grabs the collection/environment from an S3 bucket
 - runs the test and places results first in lambda's /tmp folder
-- TODO: normalize/cleanse output to make it easier to read with athena
 - publishes cleansed results to s3 bucket
+- send confirmation to code pipeline
 
 aws cloudformation package \
 --region us-east-1 \
---template-file lambda-newman-tester.yaml \
+--template-file newman-lambda-runner.yaml \
 --s3-bucket postman-newman \
 --s3-prefix lambda-newman \
---output-template-file lambda-newman-tester-output.yaml
+--output-template-file newman-lambda-runner-output.yaml
     
    
 aws cloudformation deploy \
 --region us-east-1 \
---template-file lambda-newman-tester-output.yaml \
+--template-file newman-lambda-runner-output.yaml \
 --stack-name newman-lambda-function \
---capabilities CAPABILITY_IAM 
+--capabilities CAPABILITY_IAM
 
-TODO
-- [ ] more api endpoints, e.g. secured via cognito user pool, secured via sigv4, custom transformation, oauth, etc.
+TODO: make sure lambda has permission to S3 bucket
+TODO: make sure lambda has permission to send acks to code pipeline.
+TODO: Apply granular permissions according to least priv access.
+TODO: normalize/cleanse output to make it easier to read with athena
+TODO more api endpoints, e.g. secured via cognito user pool, secured via sigv4, custom transformation, oauth, etc.
+TODO: After API created we need way to update collection file and environment file.
 
-# 05 TODO: Using athena to query test results
+# 05 - Using athena to query test results
 
-CREATE EXTERNAL TABLE IF NOT EXISTS mb_athena.newman (
-  `total` int,
-  `pending` int,
-  `failed` int 
-)
-ROW FORMAT SERDE 'org.openx.data.jsonserde.JsonSerDe'
-WITH SERDEPROPERTIES (
-  'serialization.format' = '1'
-) LOCATION 's3://newmon-json-test/'
-TBLPROPERTIES ('has_encrypted_data'='false');
+create the athena table pointing to test results bucket - see athena.sql
 
 
 # 06 TODO: Using quick sight to visualize test results.
@@ -87,6 +102,7 @@ TBLPROPERTIES ('has_encrypted_data'='false');
 
 # 07 TODO: single page app to list reports
     
+
 
 # References
 

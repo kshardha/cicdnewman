@@ -7,4 +7,4 @@ Resources:
       Handler: newman-pipeline.handler
       Runtime: nodejs6.10
       Timeout: 60
-      FunctionName: LambdaNewmanCodePipeLineFunction
+      FunctionName: PostmanCodePipelineTestRunner

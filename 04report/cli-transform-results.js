@@ -1,8 +1,33 @@
+/**
+ * CLI to take postman json test results and flatten to csv.
+ */
+
+
+/**
+ * Library to query json objects
+ * https://github.com/dchester/jsonpath
+ */
 const jp = require('jsonpath');
+
+
+/**
+ * Converts a json object to csv
+ * https://github.com/zemirco/json2csv
+ */
 const Json2csvParser = require('json2csv').Parser;
 
-//https://github.com/zemirco/json2csv
+/**
+ * flatten a json structure
+ */
+const flatten = require('flat');
 
+/**
+ * self explanatory
+ * https://github.com/felixge/node-dateformat
+ */
+const dateFormat = require('dateformat');
+
+//example report
 const report = {
     "collection": {
         "_": {
@@ -10,7 +35,7 @@ const report = {
         },
         "item": [
             {
-                "id": "f9e7ea68-536a-402a-b6d0-74718adfa3a1",
+                "id": "8ef87fce-2b4d-4166-911d-4c9d1f1df9a1",
                 "name": "health-endpoint",
                 "request": {
                     "url": {
@@ -24,10 +49,7 @@ const report = {
                         "variable": []
                     },
                     "method": "GET",
-                    "body": {
-                        "mode": "raw",
-                        "raw": ""
-                    }
+                    "body": {}
                 },
                 "response": [],
                 "event": [
@@ -49,13 +71,13 @@ const report = {
                                 "    pm.expect(pm.response.text()).to.include(\"v2.5\");",
                                 "});"
                             ],
-                            "_lastExecutionId": "d5096bdd-d06f-425d-a3f0-65ded978f969"
+                            "_lastExecutionId": "fcec43b6-21ff-4088-9765-e9780de71637"
                         }
                     }
                 ]
             },
             {
-                "id": "322ddb10-daf3-46c1-afbd-59c3050d113b",
+                "id": "9a043329-4b46-4c98-aed5-96b7a5e8127b",
                 "name": "second function",
                 "request": {
                     "url": {
@@ -76,7 +98,7 @@ const report = {
                     {
                         "listen": "test",
                         "script": {
-                            "id": "e960807b-f4df-4532-819e-1d2c50625b2e",
+                            "id": "c33e1f30-b336-4b14-b1da-18e343b8c681",
                             "type": "text/javascript",
                             "exec": [
                                 "pm.test(\"Status code is 200\", function () {",
@@ -88,10 +110,10 @@ const report = {
                                 "tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
                                 "",
                                 "pm.test(\"Body matches string\", function () {",
-                                "    pm.expect(pm.response.text()).to.include(\"v2.5\");",
+                                "    pm.expect(pm.response.text()).to.include(\"v1.1\");",
                                 "});"
                             ],
-                            "_lastExecutionId": "575ebbd5-f09a-4eef-8008-0d68a5405d79"
+                            "_lastExecutionId": "32e290b3-a7ab-464c-a1fd-09a1fcf1685c"
                         }
                     }
                 ]
@@ -108,7 +130,7 @@ const report = {
     "environment": {
         "_": {
             "postman_variable_scope": "environment",
-            "postman_exported_at": "2018-03-24T14:13:01.156Z",
+            "postman_exported_at": "2018-04-07T02:06:15.238Z",
             "postman_exported_using": "Postman/6.0.10"
         },
         "id": "45c26232-a946-422e-a84b-ad72d2fc8aaf",
@@ -116,13 +138,13 @@ const report = {
         "values": [
             {
                 "type": "any",
-                "value": "https://6if03ew4we.execute-api.us-east-1.amazonaws.com/Prod",
+                "value": "https://sc36tg90pj.execute-api.us-east-1.amazonaws.com/Prod",
                 "key": "apigw-root"
             }
         ]
     },
     "globals": {
-        "id": "0dc88e0f-66b8-41d0-9fdc-abb50e591155",
+        "id": "92c9672d-c8a2-45cf-abf7-998ab60022df",
         "values": []
     },
     "run": {
@@ -160,7 +182,7 @@ const report = {
             "assertions": {
                 "total": 6,
                 "pending": 0,
-                "failed": 1
+                "failed": 0
             },
             "testScripts": {
                 "total": 2,
@@ -174,9 +196,9 @@ const report = {
             }
         },
         "timings": {
-            "responseAverage": 110,
-            "started": 1521900957479,
-            "completed": 1521900957818
+            "responseAverage": 135,
+            "started": 1523068810966,
+            "completed": 1523068811319
         },
         "executions": [
             {
@@ -189,11 +211,11 @@ const report = {
                     "eof": false,
                     "bof": true,
                     "cr": false,
-                    "ref": "1886cd83-3749-4806-a8a0-7af2ea8ad4ef",
-                    "httpRequestId": "347dcdd4-a9e2-4c53-9bd2-65e2f70a478b"
+                    "ref": "3c837207-bb78-4f09-8482-f82a8aa2ca5f",
+                    "httpRequestId": "b3eada78-e25c-4cc1-8582-0e1d6e878db2"
                 },
                 "item": {
-                    "id": "f9e7ea68-536a-402a-b6d0-74718adfa3a1",
+                    "id": "8ef87fce-2b4d-4166-911d-4c9d1f1df9a1",
                     "name": "health-endpoint",
                     "request": {
                         "url": {
@@ -207,10 +229,7 @@ const report = {
                             "variable": []
                         },
                         "method": "GET",
-                        "body": {
-                            "mode": "raw",
-                            "raw": ""
-                        }
+                        "body": {}
                     },
                     "response": [],
                     "event": [
@@ -232,7 +251,7 @@ const report = {
                                     "    pm.expect(pm.response.text()).to.include(\"v2.5\");",
                                     "});"
                                 ],
-                                "_lastExecutionId": "d5096bdd-d06f-425d-a3f0-65ded978f969"
+                                "_lastExecutionId": "fcec43b6-21ff-4088-9765-e9780de71637"
                             }
                         }
                     ]
@@ -245,7 +264,7 @@ const report = {
                             "health"
                         ],
                         "host": [
-                            "6if03ew4we",
+                            "sc36tg90pj",
                             "execute-api",
                             "us-east-1",
                             "amazonaws",
@@ -265,7 +284,7 @@ const report = {
                         },
                         {
                             "key": "Host",
-                            "value": "6if03ew4we.execute-api.us-east-1.amazonaws.com"
+                            "value": "sc36tg90pj.execute-api.us-east-1.amazonaws.com"
                         },
                         {
                             "key": "accept-encoding",
@@ -273,13 +292,10 @@ const report = {
                         }
                     ],
                     "method": "GET",
-                    "body": {
-                        "mode": "raw",
-                        "raw": ""
-                    }
+                    "body": {}
                 },
                 "response": {
-                    "id": "0e79009f-ef60-49f9-aca7-e50e5a93c4b0",
+                    "id": "9f097db2-3214-4f97-b111-b0a42910e287",
                     "status": "OK",
                     "code": 200,
                     "header": [
@@ -297,11 +313,11 @@ const report = {
                         },
                         {
                             "key": "Date",
-                            "value": "Sat, 24 Mar 2018 14:15:56 GMT"
+                            "value": "Sat, 07 Apr 2018 02:39:44 GMT"
                         },
                         {
                             "key": "x-amzn-RequestId",
-                            "value": "de39f193-2f6d-11e8-b684-4d8db5642536"
+                            "value": "ee536009-3a0c-11e8-aaad-d5e850543dd1"
                         },
                         {
                             "key": "Access-Control-Allow-Origin",
@@ -309,11 +325,11 @@ const report = {
                         },
                         {
                             "key": "x-amz-apigw-id",
-                            "value": "EQOQZHR_IAMF1Dw="
+                            "value": "E8xZnGE6IAMFvaA="
                         },
                         {
                             "key": "X-Amzn-Trace-Id",
-                            "value": "sampled=0;root=1-5ab65d9c-4e15ee307b480c0fad864647"
+                            "value": "sampled=0;root=1-5ac82f70-521ef5a0ce36069479c214cb"
                         },
                         {
                             "key": "Access-Control-Allow-Credentials",
@@ -325,11 +341,11 @@ const report = {
                         },
                         {
                             "key": "Via",
-                            "value": "1.1 3fde21c07022d5a0a6d5c2e220c1ce8f.cloudfront.net (CloudFront)"
+                            "value": "1.1 ffd1fa62fb3d5b958da33257c789bbbe.cloudfront.net (CloudFront)"
                         },
                         {
                             "key": "X-Amz-Cf-Id",
-                            "value": "j19DMJGnIkEbhk1u5A5crJ9yBAlbm3Mmcv-igogs2jJqxVH57Jpnfw=="
+                            "value": "aJ1VkVhSJMkT7k3g42uAPa1QIeMREGP3mvf4g_4oNT99NzxlOQrpPA=="
                         }
                     ],
                     "stream": {
@@ -376,10 +392,10 @@ const report = {
                         ]
                     },
                     "cookie": [],
-                    "responseTime": 172,
+                    "responseTime": 156,
                     "responseSize": 38
                 },
-                "id": "f9e7ea68-536a-402a-b6d0-74718adfa3a1",
+                "id": "8ef87fce-2b4d-4166-911d-4c9d1f1df9a1",
                 "assertions": [
                     {
                         "assertion": "Status code is 200"
@@ -394,15 +410,15 @@ const report = {
             },
             {
                 "cursor": {
-                    "ref": "5c221894-469a-4dd5-9f68-e2a3602a3c33",
+                    "ref": "6b825922-5f07-4a47-a9a3-b78e6d0f6929",
                     "length": 2,
                     "cycles": 1,
                     "position": 1,
                     "iteration": 0,
-                    "httpRequestId": "34e5b070-b356-4e0e-9f3a-d778361b92e3"
+                    "httpRequestId": "1f0e3deb-f1e9-4f87-a813-5e2ec5f7deed"
                 },
                 "item": {
-                    "id": "322ddb10-daf3-46c1-afbd-59c3050d113b",
+                    "id": "9a043329-4b46-4c98-aed5-96b7a5e8127b",
                     "name": "second function",
                     "request": {
                         "url": {
@@ -423,7 +439,7 @@ const report = {
                         {
                             "listen": "test",
                             "script": {
-                                "id": "e960807b-f4df-4532-819e-1d2c50625b2e",
+                                "id": "c33e1f30-b336-4b14-b1da-18e343b8c681",
                                 "type": "text/javascript",
                                 "exec": [
                                     "pm.test(\"Status code is 200\", function () {",
@@ -435,10 +451,10 @@ const report = {
                                     "tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
                                     "",
                                     "pm.test(\"Body matches string\", function () {",
-                                    "    pm.expect(pm.response.text()).to.include(\"v2.5\");",
+                                    "    pm.expect(pm.response.text()).to.include(\"v1.1\");",
                                     "});"
                                 ],
-                                "_lastExecutionId": "575ebbd5-f09a-4eef-8008-0d68a5405d79"
+                                "_lastExecutionId": "32e290b3-a7ab-464c-a1fd-09a1fcf1685c"
                             }
                         }
                     ]
@@ -451,7 +467,7 @@ const report = {
                             "two"
                         ],
                         "host": [
-                            "6if03ew4we",
+                            "sc36tg90pj",
                             "execute-api",
                             "us-east-1",
                             "amazonaws",
@@ -471,7 +487,7 @@ const report = {
                         },
                         {
                             "key": "Host",
-                            "value": "6if03ew4we.execute-api.us-east-1.amazonaws.com"
+                            "value": "sc36tg90pj.execute-api.us-east-1.amazonaws.com"
                         },
                         {
                             "key": "accept-encoding",
@@ -482,7 +498,7 @@ const report = {
                     "body": {}
                 },
                 "response": {
-                    "id": "f1fd47d3-a964-4dcb-863b-f16d5ce6ab75",
+                    "id": "021e35bb-7610-4959-aed3-1c68207ff086",
                     "status": "OK",
                     "code": 200,
                     "header": [
@@ -500,11 +516,11 @@ const report = {
                         },
                         {
                             "key": "Date",
-                            "value": "Sat, 24 Mar 2018 14:15:56 GMT"
+                            "value": "Sat, 07 Apr 2018 02:39:44 GMT"
                         },
                         {
                             "key": "x-amzn-RequestId",
-                            "value": "de4bcb1a-2f6d-11e8-9b64-3177741f8edf"
+                            "value": "ee6672bc-3a0c-11e8-a048-219310587f0b"
                         },
                         {
                             "key": "Access-Control-Allow-Origin",
@@ -512,11 +528,11 @@ const report = {
                         },
                         {
                             "key": "x-amz-apigw-id",
-                            "value": "EQOQaEqOIAMFodQ="
+                            "value": "E8xZoGYfIAMFpKA="
                         },
                         {
                             "key": "X-Amzn-Trace-Id",
-                            "value": "sampled=0;root=1-5ab65d9c-ac81c5324fbe3c5b32b6627d"
+                            "value": "sampled=0;root=1-5ac82f70-9df67c64fb77b6e0bb21c44b"
                         },
                         {
                             "key": "Access-Control-Allow-Credentials",
@@ -528,11 +544,11 @@ const report = {
                         },
                         {
                             "key": "Via",
-                            "value": "1.1 3fde21c07022d5a0a6d5c2e220c1ce8f.cloudfront.net (CloudFront)"
+                            "value": "1.1 ffd1fa62fb3d5b958da33257c789bbbe.cloudfront.net (CloudFront)"
                         },
                         {
                             "key": "X-Amz-Cf-Id",
-                            "value": "X6ckf1_vM2J2Ez_aJfMFQNoyorxrIsW7WmiB4pBL_FXz2uN2oV7Tqg=="
+                            "value": "HFA0R-TgVXnmcDbmi7bG3HO6z1yQ4ulaMt1ulvmewxyoNZIXGvo9KA=="
                         }
                     ],
                     "stream": {
@@ -591,28 +607,22 @@ const report = {
                             118,
                             49,
                             46,
-                            48,
+                            49,
                             34,
                             125
                         ]
                     },
                     "cookie": [],
-                    "responseTime": 48,
+                    "responseTime": 114,
                     "responseSize": 56
                 },
-                "id": "322ddb10-daf3-46c1-afbd-59c3050d113b",
+                "id": "9a043329-4b46-4c98-aed5-96b7a5e8127b",
                 "assertions": [
                     {
                         "assertion": "Status code is 200"
                     },
                     {
-                        "assertion": "Body matches string",
-                        "error": {
-                            "name": "AssertionError",
-                            "index": 1,
-                            "message": "expected '{\"message\":\"Successful response from function two v1.0\"}' to include 'v2.5'",
-                            "stack": "AssertionError: expected '{\"message\":\"Successful response from function two v1.0\"}' to include 'v2.5'\n   at Object.eval sandbox-script.js:2:2)"
-                        }
+                        "assertion": "Body matches string"
                     },
                     {
                         "assertion": "Has Content-Type"
@@ -623,202 +633,39 @@ const report = {
         "transfers": {
             "responseTotal": 94
         },
-        "failures": [
-            {
-                "error": {
-                    "name": "AssertionError",
-                    "index": 1,
-                    "message": "expected '{\"message\":\"Successful response from function two v1.0\"}' to include 'v2.5'",
-                    "stack": "AssertionError: expected '{\"message\":\"Successful response from function two v1.0\"}' to include 'v2.5'\n   at Object.eval sandbox-script.js:2:2)",
-                    "checksum": "6c32d4c308112a491ee2ffd485f3d21c",
-                    "id": "4e818642-5f0b-4551-915f-830baa56f20c",
-                    "timestamp": 1521900957811,
-                    "stacktrace": [
-                        {
-                            "fileName": "sandbox-script.js",
-                            "lineNumber": 2,
-                            "functionName": "Object.eval",
-                            "typeName": "Object",
-                            "methodName": "eval",
-                            "columnNumber": 2,
-                            "native": false
-                        }
-                    ]
-                },
-                "at": "assertion:1 in test-script",
-                "source": {
-                    "id": "322ddb10-daf3-46c1-afbd-59c3050d113b",
-                    "name": "second function",
-                    "request": {
-                        "url": {
-                            "path": [
-                                "two"
-                            ],
-                            "host": [
-                                "{{apigw-root}}"
-                            ],
-                            "query": [],
-                            "variable": []
-                        },
-                        "method": "GET",
-                        "body": {}
-                    },
-                    "response": [],
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "id": "e960807b-f4df-4532-819e-1d2c50625b2e",
-                                "type": "text/javascript",
-                                "exec": [
-                                    "pm.test(\"Status code is 200\", function () {",
-                                    "    pm.response.to.have.status(200);",
-                                    "});",
-                                    "",
-                                    "var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
-                                    " ",
-                                    "tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
-                                    "",
-                                    "pm.test(\"Body matches string\", function () {",
-                                    "    pm.expect(pm.response.text()).to.include(\"v2.5\");",
-                                    "});"
-                                ],
-                                "_lastExecutionId": "575ebbd5-f09a-4eef-8008-0d68a5405d79"
-                            }
-                        }
-                    ]
-                },
-                "parent": {
-                    "_": {
-                        "postman_id": "c68550ac-8585-40d8-87e7-78596739f3b3"
-                    },
-                    "item": [
-                        {
-                            "id": "f9e7ea68-536a-402a-b6d0-74718adfa3a1",
-                            "name": "health-endpoint",
-                            "request": {
-                                "url": {
-                                    "path": [
-                                        "health"
-                                    ],
-                                    "host": [
-                                        "{{apigw-root}}"
-                                    ],
-                                    "query": [],
-                                    "variable": []
-                                },
-                                "method": "GET",
-                                "body": {
-                                    "mode": "raw",
-                                    "raw": ""
-                                }
-                            },
-                            "response": [],
-                            "event": [
-                                {
-                                    "listen": "test",
-                                    "script": {
-                                        "id": "0e33f567-35c3-4f51-85c1-56b04cf2b676",
-                                        "type": "text/javascript",
-                                        "exec": [
-                                            "pm.test(\"Status code is 200\", function () {",
-                                            "    pm.response.to.have.status(200);",
-                                            "});",
-                                            "",
-                                            "var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
-                                            " ",
-                                            "tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
-                                            "",
-                                            "pm.test(\"Body matches string\", function () {",
-                                            "    pm.expect(pm.response.text()).to.include(\"v2.5\");",
-                                            "});"
-                                        ],
-                                        "_lastExecutionId": "d5096bdd-d06f-425d-a3f0-65ded978f969"
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "322ddb10-daf3-46c1-afbd-59c3050d113b",
-                            "name": "second function",
-                            "request": {
-                                "url": {
-                                    "path": [
-                                        "two"
-                                    ],
-                                    "host": [
-                                        "{{apigw-root}}"
-                                    ],
-                                    "query": [],
-                                    "variable": []
-                                },
-                                "method": "GET",
-                                "body": {}
-                            },
-                            "response": [],
-                            "event": [
-                                {
-                                    "listen": "test",
-                                    "script": {
-                                        "id": "e960807b-f4df-4532-819e-1d2c50625b2e",
-                                        "type": "text/javascript",
-                                        "exec": [
-                                            "pm.test(\"Status code is 200\", function () {",
-                                            "    pm.response.to.have.status(200);",
-                                            "});",
-                                            "",
-                                            "var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
-                                            " ",
-                                            "tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
-                                            "",
-                                            "pm.test(\"Body matches string\", function () {",
-                                            "    pm.expect(pm.response.text()).to.include(\"v2.5\");",
-                                            "});"
-                                        ],
-                                        "_lastExecutionId": "575ebbd5-f09a-4eef-8008-0d68a5405d79"
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    "event": [],
-                    "variable": [],
-                    "info": {
-                        "id": "c68550ac-8585-40d8-87e7-78596739f3b3",
-                        "name": "NewmanAPI",
-                        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-                    }
-                },
-                "cursor": {
-                    "ref": "5c221894-469a-4dd5-9f68-e2a3602a3c33",
-                    "length": 2,
-                    "cycles": 1,
-                    "position": 1,
-                    "iteration": 0,
-                    "httpRequestId": "34e5b070-b356-4e0e-9f3a-d778361b92e3",
-                    "scriptId": "e960807b-f4df-4532-819e-1d2c50625b2e",
-                    "execution": "575ebbd5-f09a-4eef-8008-0d68a5405d79"
-                }
-            }
-        ],
+        "failures": [],
         "error": null
     }
 };
 
+//extract the stats object from test results
 let stats = jp.value(report, '$..stats');
 
-//let executions = jp.query(report, '$..executions');
+//console.log("Stats:\n" + JSON.stringify(stats, null, 4));
 
-console.log("Stats:\n" + JSON.stringify(stats, null, 4));
+//flatten stats object
+let flatStats = flatten(stats);
 
-//console.log("Executions:\n" + JSON.stringify(executions, null, 4));
+//add report date and time
+flatStats['report.date'] = dateFormat(new Date(), "yyyymmdd");
+flatStats['report.time'] = dateFormat(new Date(), "HMMss");
 
-const fields = ['total', 'pending', 'failed'];
+//console.log(flatStats);
 
+//define fields we want to extract from json object
+const fields = [
+    'report.date',
+    'report.time',
+    'iterations.total',
+    'iterations.failed',
+    'requests.total',
+    'requests.failed',
+    'items.total',
+    'scripts.total'
+];
+
+//parse json and produce csv output
 const json2csvParser = new Json2csvParser({ fields });
-
-
-
-const csv = json2csvParser.parse(stats);
+const csv = json2csvParser.parse(flatStats);
 
 console.log(csv);

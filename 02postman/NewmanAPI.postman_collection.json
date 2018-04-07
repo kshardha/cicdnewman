@@ -32,10 +32,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
+				"body": {},
 				"url": {
 					"raw": "{{apigw-root}}/health",
 					"host": [
@@ -54,7 +51,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "e960807b-f4df-4532-819e-1d2c50625b2e",
+						"id": "b16b8a54-4715-4482-87a8-e30ddfff3486",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -66,7 +63,7 @@
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"v2.5\");",
+							"    pm.expect(pm.response.text()).to.include(\"v1.1\");",
 							"});"
 						]
 					}
