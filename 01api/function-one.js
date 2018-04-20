@@ -5,7 +5,7 @@ exports.handler = (event, context, callback) => {
     let response;
     let body = {};
 
-    body.message = ("Successful response from function 1 - v1.1");
+    body.message = ("Successful response from function 1 - v1.2");
 
     response = {
         statusCode: 200,
