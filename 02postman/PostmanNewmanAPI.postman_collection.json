@@ -1,17 +1,17 @@
 {
 	"info": {
 		"_postman_id": "c68550ac-8585-40d8-87e7-78596739f3b3",
-		"name": "NewmanAPI",
+		"name": "PostmanNewmanAPI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "health-endpoint",
+			"name": "function-one",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "0e33f567-35c3-4f51-85c1-56b04cf2b676",
+						"id": "82defb2e-da81-46f5-aab8-c8c317de297e",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -23,7 +23,7 @@
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"v2.5\");",
+							"    pm.expect(pm.response.text()).to.include(\"v1.0\");",
 							"});"
 						]
 					}
@@ -32,26 +32,29 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {},
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
 				"url": {
-					"raw": "{{apigw-root}}/health",
+					"raw": "{{apigw-root}}/one",
 					"host": [
 						"{{apigw-root}}"
 					],
 					"path": [
-						"health"
+						"one"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "second function",
+			"name": "function-two",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "b16b8a54-4715-4482-87a8-e30ddfff3486",
+						"id": "8e9f5968-616e-4d0f-b808-e5c524a30c1e",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -63,7 +66,7 @@
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"v1.1\");",
+							"    pm.expect(pm.response.text()).to.include(\"v1.0\");",
 							"});"
 						]
 					}
