@@ -4,7 +4,7 @@ Resources:
   HealthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: function-two.handler
+      Handler: function-one.handler
       Runtime: nodejs6.10
       CodeUri: ./
       FunctionName: FunctionOne
