@@ -12,6 +12,8 @@ let dateFormat = require('dateformat');
  *
  * TODO: reduce package size
  * TODO: handle failure
+ * TODO: environment variables
+ * TODO: add policy to yaml to allow appropriate access to code pipeline, buckets, etc.
  */
 
 /**
@@ -68,7 +70,7 @@ exports.handler = function(event, context) {
 
         let params = {
             Bucket: 'postman-newman',
-            Key: 'NewmanAPI.postman_collection.json'
+            Key: 'postman-env-files/PostmanNewmanAPI.postman_collection.json'
         };
 
         console.log(JSON.stringify(params));
@@ -99,7 +101,7 @@ exports.handler = function(event, context) {
 
         let params = {
             Bucket: 'postman-newman',
-            Key: 'newman-postman-environment.postman_environment.json'
+            Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json'
         };
 
         let file = fs.createWriteStream('/tmp/postman.s3.environment.json');
@@ -158,8 +160,8 @@ exports.handler = function(event, context) {
     };
 
     /**
-     * https://gist.github.com/homam/8646090
-     * TODO: timestamp on file name.
+     *
+     * TODO: environment variable for test-results folder
      */
     let publishJSONResultsToS3 = function(callback){
 

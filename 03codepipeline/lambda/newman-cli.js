@@ -7,8 +7,8 @@ let fs = require('fs');
 let dateFormat = require('dateformat');
 
 /**
- * CLI version of lambda function used to execute postman collection in code pipeline stage
- *
+ * local CLI version of lambda function used to execute postman collection in code pipeline stage.
+ * use this version to test locally.
  */
 
 
@@ -22,7 +22,7 @@ let getPostmanCollection = function(callback){
 
     let params = {
         Bucket: 'postman-newman',
-        Key: 'NewmanAPI.postman_collection.json'
+        Key: 'postman-env-files/PostmanNewmanAPI.postman_collection.json'
     };
 
     console.log(JSON.stringify(params));
@@ -53,7 +53,7 @@ let getPostmanEnvironment = function(callback){
 
     let params = {
         Bucket: 'postman-newman',
-        Key: 'newman-postman-environment.postman_environment.json'
+        Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json'
     };
 
     let file = fs.createWriteStream('./postman.s3.environment.json');

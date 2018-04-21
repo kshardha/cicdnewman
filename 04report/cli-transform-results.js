@@ -644,24 +644,24 @@ let stats = jp.value(report, '$..stats');
 //console.log("Stats:\n" + JSON.stringify(stats, null, 4));
 
 //flatten stats object
-let flatStats = flatten(stats);
+let flatStats = flatten(stats, { delimiter: '_' });
 
 //add report date and time
-flatStats['report.date'] = dateFormat(new Date(), "yyyymmdd");
-flatStats['report.time'] = dateFormat(new Date(), "HMMss");
+flatStats['report_date'] = dateFormat(new Date(), "yyyy/mm/dd");
+flatStats['report_time'] = dateFormat(new Date(), "H:MM:ss");
 
 //console.log(flatStats);
 
 //define fields we want to extract from json object
 const fields = [
-    'report.date',
-    'report.time',
-    'iterations.total',
-    'iterations.failed',
-    'requests.total',
-    'requests.failed',
-    'items.total',
-    'scripts.total'
+    'report_date',
+    'report_time',
+    'iterations_total',
+    'iterations_failed',
+    'requests_total',
+    'requests_failed',
+    'items_total',
+    'scripts_total'
 ];
 
 //parse json and produce csv output

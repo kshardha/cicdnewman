@@ -106,20 +106,15 @@ allowing us to automate test execution via code pipeline
 On to our next baby step before automating postman in code pipeline. Here
 we will show how to execute api gateway deployments using code pipeline.
 
-- Manual Setup
+
 TODO: screen shots and instructions.
-
-- Cloud Formation setup
-TODO: Pipeline currently setup manually via AWS console - create via cloud formation
-
-
 TODO: Apply granular permissions according to least priv.
 
 
 # 04 - add automated postman collection testing to pipeline
 This section demonstrates how to add lambda function to run postman collections
 via code pipeline stage. This is the lambda function responsible for executing a 
-postman collection. We need to deploy it first before we can add it to a stage in code pipeline
+postman collection.
 
 NOTE: This lambda function needs permissions to
 - allow read access to S3 bucket to get postman collection and environment files
@@ -127,30 +122,63 @@ NOTE: This lambda function needs permissions to
 - allow access to code pipeline so it can acknowledge successful execution to code pipeline
 
 The function 
-- grabs the collection/environment from an S3 bucket
+- grabs the postman collection and environment file from an S3 bucket
 - runs the test and places results first in lambda's /tmp folder
 - publishes cleansed results to s3 bucket
 - send confirmation to code pipeline
 
+* cd into 03codepipeline/lambda folder
+* put your postman collection.json and environment.json in a bucket of your choosing.
+
+* Update the lambda function code pointing to the bucket and key of your postman collection and
+environment file. You are looking for this code to update with your specific bucket and key.
+    
+```
+let params = {
+    Bucket: 'postman-newman',
+    Key: 'postman-env-files/PostmanNewmanAPI.postman_collection.json'
+};
+
+let params = {
+    Bucket: 'postman-newman',
+    Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json'
+};
+```
+
+TODO: replace this with environment variables and instructions to update env variables.
+
+* execute the following command to build and package this lambda function
+```
 aws cloudformation package \
 --region us-east-1 \
 --template-file newman-lambda-runner.yaml \
 --s3-bucket postman-newman \
---s3-prefix lambda-newman \
+--s3-prefix newman-lambda-runner \
 --output-template-file newman-lambda-runner-output.yaml
-    
-   
+```
+
+* execute the following to deploy the function
+```
 aws cloudformation deploy \
 --region us-east-1 \
 --template-file newman-lambda-runner-output.yaml \
 --stack-name newman-lambda-function \
 --capabilities CAPABILITY_IAM
 
-TODO: make sure lambda has permission to S3 bucket
-TODO: make sure lambda has permission to send acks to code pipeline.
+```
+
+* you can now add this function as a stage in code pipe line.
+
+TODO: instructions and screen shots
+ 
+
+* execute your pipeline now and when complete you will 
+
+
+
 TODO: Apply granular permissions according to least priv access.
 TODO: normalize/cleanse output to make it easier to read with athena
-TODO more api endpoints, e.g. secured via cognito user pool, secured via sigv4, custom transformation, oauth, etc.
+TODO  more api endpoints, e.g. secured via cognito user pool, secured via sigv4, custom transformation, oauth, etc.
 TODO: After API created we need way to update collection file and environment file.
 
 # 05 - Using athena to query test results

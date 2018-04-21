@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "82defb2e-da81-46f5-aab8-c8c317de297e",
+						"id": "2b171c9f-38ec-4465-bf25-6802c21b069e",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -23,7 +23,7 @@
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"v1.0\");",
+							"    pm.expect(pm.response.text()).to.include(\"v1.4\");",
 							"});"
 						]
 					}
