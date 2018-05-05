@@ -6,6 +6,18 @@ let s3 = new AWS.S3({apiVersion: '2006-03-01'});
 let fs = require('fs');
 let dateFormat = require('dateformat');
 
+
+/**
+ * Library to query json objects
+ * https://github.com/dchester/jsonpath
+ */
+const jp = require('jsonpath');
+
+/**
+ * flatten a json structure
+ */
+const flatten = require('flat');
+
 /**
  * local CLI version of lambda function used to execute postman collection in code pipeline stage.
  * use this version to test locally.
@@ -35,7 +47,6 @@ let getPostmanCollection = function(callback){
 
         callback(null, 'one'); //async call back
     });
-
 
     //TODO: stop and return error
     s3.getObject(params).createReadStream().on('error', function(err){
@@ -108,8 +119,42 @@ let executePostmanCollection = function(callback){
 
 };
 
+
 /**
- * https://gist.github.com/homam/8646090
+ * pre process result file by flattening
+ * @param callback
+ */
+let preprocessPostmanResults = function(callback){
+
+    let contents = fs.readFileSync('./results/output.json',{encoding: 'utf-8'});
+
+    //get the stats object
+    let stats = jp.value(JSON.parse(contents), '$..stats');
+
+    //flatten
+    let flatStats = flatten(stats, { delimiter: '_' });
+
+    //add report date and time
+    flatStats['report_date'] = dateFormat(new Date(), "yyyy/mm/dd");
+    flatStats['report_time'] = dateFormat(new Date(), "H:MM:ss");
+
+    console.log(JSON.stringify(flatStats));
+
+    let filepath = "./results/output.json";
+
+    fs.writeFile(filepath, JSON.stringify(flatStats), function(error) {
+        if (error) {
+            console.error("write error:  " + error.message);
+        } else {
+            console.log("Successful Write to " + filepath);
+            callback(null, 'preprocessPostmanResults'); //async call back
+        }
+    });
+
+};
+
+/**
+ *
  */
 let publishJSONResultsToS3 = function(callback){
 
@@ -151,6 +196,7 @@ async.series(
         getPostmanCollection,
         getPostmanEnvironment,
         executePostmanCollection,
+        preprocessPostmanResults,
         publishJSONResultsToS3
     ]
 );

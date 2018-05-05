@@ -1,0 +1,9 @@
+{
+  "fileLocations": [
+    {
+      "URIPrefixes": [
+        "https://s3.amazonaws.com/postman-newman/test-results/"
+      ]
+    }
+  ]
+}

@@ -1,17 +1,17 @@
 {
 	"info": {
-		"_postman_id": "c68550ac-8585-40d8-87e7-78596739f3b3",
+		"_postman_id": "66d64993-b3d7-4829-9b72-02354090cbe4",
 		"name": "PostmanNewmanAPI",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "function-one",
+			"name": "function one get",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "2b171c9f-38ec-4465-bf25-6802c21b069e",
+						"id": "9a4f27a4-7313-425c-a8a7-fe97a347e5b7",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -19,7 +19,7 @@
 							"});",
 							"",
 							"var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
-							" ",
+							"",
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
@@ -32,10 +32,7 @@
 			"request": {
 				"method": "GET",
 				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
+				"body": {},
 				"url": {
 					"raw": "{{apigw-root}}/one",
 					"host": [
@@ -49,12 +46,12 @@
 			"response": []
 		},
 		{
-			"name": "function-two",
+			"name": "function two get",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "8e9f5968-616e-4d0f-b808-e5c524a30c1e",
+						"id": "e0d5e118-768e-4aba-953c-e07b4ea69ddd",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -62,11 +59,11 @@
 							"});",
 							"",
 							"var contentTypeHeaderExists = responseHeaders.hasOwnProperty(\"Content-Type\");",
-							" ",
+							"",
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"v1.0\");",
+							"    pm.expect(pm.response.text()).to.include(\"v1.1\");",
 							"});"
 						]
 					}

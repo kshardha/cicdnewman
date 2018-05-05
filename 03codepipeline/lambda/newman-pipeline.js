@@ -5,6 +5,18 @@ let s3 = new AWS.S3({apiVersion: '2006-03-01'});
 let fs = require('fs');
 let dateFormat = require('dateformat');
 
+
+/**
+ * Library to query json objects
+ * https://github.com/dchester/jsonpath
+ */
+const jp = require('jsonpath');
+
+/**
+ * flatten a json structure
+ */
+const flatten = require('flat');
+
 /**
  * This lambda function is called from code pipeline
  * and executes postman collections in order to
@@ -151,11 +163,43 @@ exports.handler = function(event, context) {
             } else {
 
                 console.log('collection run completed.');
-
                 callback(null, 'two'); //async call back
             }
         });
 
+
+    };
+
+    /**
+     * pre process result file by flattening
+     * @param callback
+     */
+    let preprocessPostmanResults = function(callback){
+
+        let contents = fs.readFileSync('/tmp/results/output.json',{encoding: 'utf-8'});
+
+        //get the stats object
+        let stats = jp.value(JSON.parse(contents), '$..stats');
+
+        //flatten
+        let flatStats = flatten(stats, { delimiter: '_' });
+
+        //add report date and time
+        flatStats['report_date'] = dateFormat(new Date(), "yyyy/mm/dd");
+        flatStats['report_time'] = dateFormat(new Date(), "H:MM:ss");
+
+        console.log(JSON.stringify(flatStats));
+
+        let filepath = "/tmp/results/output.json";
+
+        fs.writeFile(filepath, JSON.stringify(flatStats), function(error) {
+            if (error) {
+                console.error("write error:  " + error.message);
+            } else {
+                console.log("Successful Write to " + filepath);
+                callback(null, 'preprocessPostmanResults'); //async call back
+            }
+        });
 
     };
 
@@ -214,17 +258,14 @@ exports.handler = function(event, context) {
 
     };
 
-    console.log(' >>>>> CALLING ASYNC.SERIES FUNCTIONS <<<<<<< ');
-
     async.series(
         [
             getPostmanCollection,
             getPostmanEnvironment,
             executePostmanCollection,
+            preprocessPostmanResults,
             publishJSONResultsToS3,
             notifyCodePipeLine
         ]
     );
-
-    console.log(' >>>>> FINISHED EXECUTION <<<<<<< ');
 };
