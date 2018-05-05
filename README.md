@@ -7,7 +7,9 @@ This post will demonstrate use of code pipeline to build, deploy and functionall
 
 # 01 - API deployment
 
-First we will deploy a very simple api to test using Postman. 
+First we will deploy a very simple api to test using Postman. And I do mean simple: 2 endpoints backed by lambda to test simple get methods. This should be enough to illustrate the concept and be the basis for your own tests.
+
+TODO: simple diagram of api gw w/ 2 lambdas and postman.
 
 * Using our command line navigate to directory (01api) containing the source code for our api and yaml template used to package and deploy our api. 
 * From there you will execute the following commands to deploy the api. 
@@ -40,6 +42,8 @@ aws cloudformation deploy \
 </p></details><p/>
 
 # 02 - API testing with Postman client and cli
+
+In this section we will use the Postman client and the CLI to test our api and make sure it meets our functional requirements.
 
 #### via the postman client
 
@@ -133,8 +137,7 @@ aws cloudformation deploy \
 
       </p></details><p/>
 
-That was a simple test illustrating how to use postman to manually validate API response 
-requirements. We will now move on to execute via cli.
+That was a simple test illustrating how to use postman to manually validate API response requirements. We will now move on to execute via cli.
 
 #### via the newman cli
 
@@ -211,8 +214,47 @@ we will show how to execute api gateway deployments using code pipeline.
 
     </p></details><p/>
 
-*Continue here with screen shots*
+* after pressing "Save build project" you will see the following scree shot where you will click on "View project details" to open the code build project details page.
+    <details><summary>Screenshot: Create Pipeline step 3 - saved build project</summary><p>
 
+    ![Export Env](readme_images/3_6_pipeline_build_saved.png)
+
+    </p></details><p/>
+
+* A new browser tab will open showing the code build project page. Press "Edit Project" button to edit the build project details.
+* In the "Environment: How to build" section press "Update build specification" in order to edit the "Buildspec name" setting. You will now see the following screen.
+
+    <details><summary>Screenshot: Create Pipeline step 3 - edit build project</summary><p>
+
+    ![Export Env](readme_images/3_8_pipeline_build_edit.png)
+
+    </p></details><p/>
+
+* TODO: create cloud formation role
+
+* We will now set up the cloud formation deployment.
+
+    <details><summary>Screenshot: Create Pipeline step 4 - deploy</summary><p>
+
+    ![Export Env](readme_images/3_8_pipeline_deploy.png)
+
+    </p></details><p/>
+
+* Pipeline service role (TODO)
+
+    <details><summary>Screenshot: Create Pipeline step 4 - service role</summary><p>
+
+    ![Export Env](readme_images/3_9_pipeline_service_role.png)
+
+    </p></details><p/>
+
+* Confirm and create pipline
+
+    <details><summary>Screenshot: Create Pipeline step 4 - create pipeline</summary><p>
+
+    ![Export Env](readme_images/3_10_pipeline_save_confirm.png)
+
+    </p></details><p/>
 
 * At this point you should have an API that is automatically deployed anytime you commit a change to your project.
 * You can now grab the new API endpoint form the AWS API Gateway console and update your postman enviornment file to this new endpoint.
@@ -222,10 +264,9 @@ we will show how to execute api gateway deployments using code pipeline.
 TODO: Apply granular permissions according to least priv.
 
 
-# 04 - add automated postman collection testing to pipeline
+# 04 - automated postman collection testing
 
-This section demonstrates how to add lambda function to run postman collections
-via code pipeline stage. This is the lambda function responsible for executing a postman collection.
+This section demonstrates how to execute postman collections via code pipeline and store our test results in S3. We will deploy a lambda function responsible for executing Postman collections.
 
 NOTE: This lambda function needs permissions to
 - allow read access to S3 bucket to get postman collection and environment files
@@ -276,13 +317,12 @@ aws cloudformation deploy \
 --capabilities CAPABILITY_IAM
 ```
 
-* you can now add this function as a stage in code pipe line.
+* you will now add this function as a stage in code pipeline.
 
 TODO: edit pipeline instructions and screen shots
  
 
 * execute your pipeline now and when complete you will 
-
 
 
 TODO: Apply granular permissions according to least priv access.
@@ -291,17 +331,60 @@ TODO  more api endpoints, e.g. secured via cognito user pool, secured via sigv4,
 
 # 05 - Using athena to query test results
 
-create the athena table pointing to test results bucket - see athena.sql
+* create the athena table pointing to test results bucket
+
+    <details><summary>Code: Athena SQL</summary><p>
+
+    ```sql
+      CREATE EXTERNAL TABLE `test_results`(
+        `iterations_total` int ,
+        `iterations_pending` int ,
+        `iterations_failed` int ,
+        `items_total` int ,
+        `items_pending` int ,
+        `items_failed` int ,
+        `scripts_total` int ,
+        `scripts_pending` int ,
+        `scripts_failed` int ,
+        `prerequests_total` int ,
+        `prerequests_pending` int ,
+        `prerequests_failed` int ,
+        `requests_total` int ,
+        `requests_pending` int ,
+        `requests_failed` int ,
+        `tests_total` int ,
+        `tests_pending` int ,
+        `tests_failed` int ,
+        `assertions_total` int ,
+        `assertions_pending` int ,
+        `assertions_failed` int ,
+        `testscripts_total` int ,
+        `testscripts_pending` int ,
+        `testscripts_failed` int ,
+        `prerequestscripts_total` int ,
+        `prerequestscripts_pending` int ,
+        `prerequestscripts_failed` int ,
+        `report_date` string ,
+        `report_time` string )
+      ROW FORMAT SERDE
+        'org.openx.data.jsonserde.JsonSerDe'
+      WITH SERDEPROPERTIES (
+        'paths'='assertions_failed,assertions_pending,assertions_total,items_failed,items_pending,items_total,iterations_failed,iterations_pending,iterations_total,prerequestScripts_failed,prerequestScripts_pending,prerequestScripts_total,prerequests_failed,prerequests_pending,prerequests_total,report_date,report_time,requests_failed,requests_pending,requests_total,scripts_failed,scripts_pending,scripts_total,testScripts_failed,testScripts_pending,testScripts_total,tests_failed,tests_pending,tests_total')
+      STORED AS INPUTFORMAT
+        'org.apache.hadoop.mapred.TextInputFormat'
+      OUTPUTFORMAT
+        'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+      LOCATION
+        's3://postman-newman/test-results/'
+    ```
+
+* You can now query your test results. 
 
 
-# 06 TODO: Using quick sight to visualize test results.
+# 06 Using quick sight to visualize test results.
 
 
-#### reference
-- [Athena and JSON](https://aws.amazon.com/blogs/big-data/create-tables-in-amazon-athena-from-nested-json-and-mappings-using-jsonserde/)
-- [Quick Sight & JSON](https://docs.aws.amazon.com/quicksight/latest/user/supported-data-sources.html#json-data-sources)
-
-# 07 TODO: single page app to list reports
+# 07 Creating single page app to list reports
 
 
 # References
@@ -319,3 +402,7 @@ create the athena table pointing to test results bucket - see athena.sql
 [Automating Deployment of Lambda-based Applications](https://docs.aws.amazon.com/lambda/latest/dg/automating-deployment.html)
 
 [Lambda in Pipeline](https://docs.aws.amazon.com/codepipeline/latest/userguide/actions-invoke-lambda-function.html)
+
+[Athena and JSON](https://aws.amazon.com/blogs/big-data/create-tables-in-amazon-athena-from-nested-json-and-mappings-using-jsonserde/)
+
+[Quick Sight & JSON](https://docs.aws.amazon.com/quicksight/latest/user/supported-data-sources.html#json-data-sources)

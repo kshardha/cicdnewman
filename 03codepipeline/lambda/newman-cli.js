@@ -136,7 +136,7 @@ let preprocessPostmanResults = function(callback){
 
     //add report date and time
     flatStats['report_date'] = dateFormat(new Date(), "yyyy/mm/dd");
-    flatStats['report_time'] = dateFormat(new Date(), "H:MM:ss");
+    flatStats['report_time'] = dateFormat(new Date(), "HH:mm:ss");
 
     console.log(JSON.stringify(flatStats));
 
