@@ -9,3 +9,19 @@ Resources:
       Timeout: 60
       MemorySize: 512
       FunctionName: PostmanCodePipelineTestRunner
+      Policies:
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+                - s3:GetObject
+                - s3:GetObjectVersion
+              Resource: arn:aws:s3:::postman-newman*
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - codepipeline:PutJobSuccessResult
+                - codepipeline:PutJobSuccessFailure
+              Resource: "*"
