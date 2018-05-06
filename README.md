@@ -73,16 +73,22 @@ In this section we will use the Postman client and the CLI to test our api and m
 
   * add your api gateway url. Key="apigw-root" Value = <api gateway root url from console\>
 
+
+    <details><summary>Screenshot: API Gateway URL</summary><p>
+
+    ![Environment Variables](readme_images/2_4_api_gateway_url.png)
+
+    </p></details><p/>
+
+
     <details><summary>Screenshot: Environment Variables</summary><p>
 
     ![Environment Variables](readme_images/2_4_environment_variables.png)
 
     </p></details><p/>
 
-
 * create your api request to function one. 
-  * using your environment configuration you should define your request as a get request to 
-  {{apigw-root}}/one
+  * create a get request to function one using your environment variable, i.e. {{apigw-root}}/one
   * You can execute this call now and observe the response from API Gateway
     * in the "Body" pane you should have a response as follows:
         {
