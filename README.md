@@ -8,9 +8,11 @@ This post will demonstrate use of code pipeline to build, deploy and functionall
 
 First we will deploy a very simple api to test using Postman. And I do mean simple: 2 endpoints backed by lambda to test simple get methods. This should be enough to illustrate the concept and be the basis for your own tests.
 
+* First fork the exisiting repo in github into your own account and check out the forked repo to your local dev environment. 
+* Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as you will see in subsequent instructions and screen shots. You will need to create your own and reference it appropriatley.
 * Using our command line navigate to directory (01api) containing the source code for our api and yaml template used to package and deploy our api. 
 * From there you will execute the following commands to deploy the api. 
-  * NOTE: please specify your own region, s3 bucket and s3 bucket prefix.
+  * NOTE: rememeber to specify your own region and s3 bucket.
 
   ```
   aws cloudformation package \
@@ -38,7 +40,7 @@ First we will deploy a very simple api to test using Postman. And I do mean simp
   </p></details><p/>
 
 * When your stack creation is complete you will have an api to test.
-* Take a look at the API Gateway and Lambda consoles to see what the cloudformation tempaltes created.
+* Take a look at the API Gateway and Lambda consoles to see what the cloudformation templates created.
 
 
 # 02 - API testing with Postman client and cli
