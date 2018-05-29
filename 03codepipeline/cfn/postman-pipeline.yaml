@@ -1,0 +1,222 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Code pipeline for automated api functional testing
+
+Parameters:
+
+  GitHubRepositoryName:
+    Type: String
+    Description: repository name.
+    MinLength: 1
+    MaxLength: 100
+  GitHubRepositoryToken:
+    Type: String
+    Description: repository token.
+    MinLength: 1
+    MaxLength: 100
+  ProjectId:
+    Type: String
+    Description: Project ID.
+    AllowedPattern: '^[a-z]([a-z0-9-])+$'
+    ConstraintDescription: >-
+      Project IDs must be between 2 and 15 characters, begin with a letter, and
+      only contain lowercase letters, numbers, and hyphens (-).
+    MinLength: 2
+    MaxLength: 15
+
+Resources:
+
+  CodePipelineTrustRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName:
+        Fn::Sub: ${AWS::StackName}-CodePipelineRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "codepipeline.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: /
+      Policies:
+        -
+          PolicyName:
+            Fn::Sub: ${AWS::StackName}-CodePipelineRolePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "s3:DeleteObject"
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:ListBucket"
+                  - "s3:PutObject"
+                  - "s3:GetBucketPolicy"
+                Resource: '*'
+              -
+                Effect: "Allow"
+                Action:
+                  - "codebuild:StartBuild"
+                  - "codebuild:BatchGetBuilds"
+                Resource: '*'
+
+  CodeBuildServiceRole:
+      Type: AWS::IAM::Role
+      Properties:
+          RoleName:
+            Fn::Sub: ${AWS::StackName}-CodeBuildServiceRole
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Principal:
+                  Service:
+                    - "codebuild.amazonaws.com"
+                Action:
+                  - "sts:AssumeRole"
+          Path: /service-role/
+          Policies:
+              -
+                PolicyName:
+                  Fn::Sub: ${AWS::StackName}-CodeBuildServiceRole-Policy
+                PolicyDocument:
+                  Version: "2012-10-17"
+                  Statement:
+                    -
+                      Effect: "Allow"
+                      Action:
+                        - "logs:CreateLogGroup"
+                        - "logs:CreateLogStream"
+                        - "logs:PutLogEvents"
+                      Resource:
+                        - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+                    -
+                      Effect: "Allow"
+                      Action:
+                        - "s3:PutObject"
+                        - "s3:GetObject"
+                        - "s3:GetObjectVersion"
+                        - "s3:ListBucket"
+                      Resource:
+                        - Fn::Sub: arn:aws:s3:::${AWS::StackName}-codepipeline-artifact-bucket/*
+                        - Fn::Sub: arn:aws:s3:::${AWS::StackName}-codepipeline-artifact-bucket
+                        - Fn::Sub: arn:aws:s3:::postman-newman/*
+                        - Fn::Sub: arn:aws:s3:::postman-newman
+                    -
+                      Effect: "Allow"
+                      Action:
+                        - "lambda:CreateFunction"
+                        - "lambda:GetFunction"
+                        - "lambda:InvokeFunction"
+                        - "lambda:ListFunctions"
+                        - "lambda:UpdateFunctionCode"
+                        - "lambda:UpdateFunctionConfiguration"
+                        - "iam:PassRole"
+                      Resource:
+                        - "*"
+
+
+  CodePipelineArtifactBucket:
+    DeletionPolicy: Delete
+    Type: 'AWS::S3::Bucket'
+    Description: S3 bucket for pipeline artifacts
+    Properties:
+      AccessControl: Private
+      BucketName:
+        Fn::Sub: ${AWS::StackName}-codepipeline-artifact-bucket
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-codepipeline-artifact-bucket
+
+  NewmanCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name:
+        Fn::Sub: ${AWS::StackName}-CodeBuildProject
+      Description: NewmanCodeBuildProject build project
+      ServiceRole:
+        Fn::GetAtt: [ CodeBuildServiceRole, Arn ]
+      Artifacts:
+        Type: S3
+        Location:
+          Ref: CodePipelineArtifactBucket
+        Name:
+          Fn::Sub: ${AWS::StackName}-CodeBuildProject
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/nodejs:8.11.0
+      Source:
+        Location:
+          Fn::Sub: https://github.com/juan4aws/cicdnewman
+        Type:  GITHUB
+        BuildSpec: 01api/buildspec.yml
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: Name
+          Value:
+            Fn::Sub: ${AWS::StackName}-CodeBuildProject
+
+  NewmanCodePipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      Name:
+        Fn::Sub: ${AWS::StackName}-CodePipeline
+      RoleArn:
+        Fn::GetAtt: [ CodePipelineTrustRole, Arn ]
+      ArtifactStore:
+        Type: S3
+        Location: !Ref CodePipelineArtifactBucket
+      Stages:
+        - Actions:
+            - ActionTypeId:
+                Owner: ThirdParty
+                Category: Source
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                Owner: juan4aws
+                PollForSourceChanges: false
+                Repo: !Ref GitHubRepositoryName
+                Branch: master
+                OAuthToken: !Ref GitHubRepositoryToken
+              InputArtifacts: []
+              OutputArtifacts:
+                - Name: !Join
+                    - '-'
+                    - - !Ref ProjectId
+                      - SourceArtifact
+              RunOrder: 1
+              Name: ApplicationSource
+          Name: Source
+
+        - Actions:
+            - ActionTypeId:
+                Owner: AWS
+                Category: Build
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref NewmanCodeBuildProject
+              InputArtifacts:
+                - Name: !Join
+                    - '-'
+                    - - !Ref ProjectId
+                      - SourceArtifact
+              OutputArtifacts:
+                - Name: !Join
+                    - '-'
+                    - - !Ref ProjectId
+                      - BuildArtifact
+              RunOrder: 1
+              Name: BuildProject
+          Name: Build

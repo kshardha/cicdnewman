@@ -450,3 +450,9 @@ The function
 [Athena and JSON](https://aws.amazon.com/blogs/big-data/create-tables-in-amazon-athena-from-nested-json-and-mappings-using-jsonserde/)
 
 [Quick Sight & JSON](https://docs.aws.amazon.com/quicksight/latest/user/supported-data-sources.html#json-data-sources)
+
+[Serverless UI Testing](https://github.com/awslabs/serverless-automated-ui-testing)
+
+[Serverless Performance Testing](https://aws.amazon.com/blogs/apn/performance-testing-in-continuous-delivery-using-aws-codepipeline-and-blazemeter/)
+
+
