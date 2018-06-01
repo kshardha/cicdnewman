@@ -5,14 +5,17 @@ Parameters:
 
   GitHubRepositoryName:
     Type: String
-    Description: repository name.
+    Description: GitHub repository name.
     MinLength: 1
     MaxLength: 100
-  GitHubRepositoryToken:
+  GitHubUser:
+    Type: String
+  GitHubBranch:
+    Type: String
+  GitHubToken:
     Type: String
     Description: repository token.
-    MinLength: 1
-    MaxLength: 100
+    NoEcho: true
   ProjectId:
     Type: String
     Description: Project ID.
@@ -22,6 +25,10 @@ Parameters:
       only contain lowercase letters, numbers, and hyphens (-).
     MinLength: 2
     MaxLength: 15
+  TestRunnerLambdaFunctionName:
+    Type: String
+    Description: Lambda function used to execute postman collection tests.
+
 
 Resources:
 
@@ -41,6 +48,7 @@ Resources:
             Action:
               - "sts:AssumeRole"
       Path: /
+      #TODO: scope resources
       Policies:
         -
           PolicyName:
@@ -63,6 +71,28 @@ Resources:
                 Action:
                   - "codebuild:StartBuild"
                   - "codebuild:BatchGetBuilds"
+                Resource: '*'
+              -
+                Effect: "Allow"
+                Action:
+                  - "cloudformation:DescribeStacks"
+                  - "cloudformation:DescribeChangeSet"
+                  - "cloudformation:CreateStack"
+                  - "cloudformation:DeleteStack"
+                  - "cloudformation:UpdateStack"
+                  - "cloudformation:CreateChangeSet"
+                  - "cloudformation:DeleteChangeSet"
+                  - "cloudformation:ExecuteChangeSet"
+                  - "cloudformation:SetStackPolicy"
+                  - "cloudformation:ValidateTemplate"
+                  - "iam:PassRole"
+                Resource: '*'
+              -
+                Effect: "Allow"
+                Action:
+                  - "lambda:ListFunctions"
+                  - "lambda:GetFunctionConfiguration"
+                  - "lambda:InvokeFunction"
                 Resource: '*'
 
   CodeBuildServiceRole:
@@ -121,6 +151,54 @@ Resources:
                       Resource:
                         - "*"
 
+  CloudFormationTrustRole:
+    Type: 'AWS::IAM::Role'
+    Description: Creating service role in IAM for AWS CloudFormation
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AdministratorAccess'
+      RoleName:
+        Fn::Sub: ${AWS::StackName}-CloudFormationTrustRole
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+
+  PostmanLambdaTestRunnerRole:
+      Type: AWS::IAM::Role
+      Properties:
+          RoleName:
+            Fn::Sub: S3UploadLambdaRole-${AWS::StackName}
+          AssumeRolePolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Principal:
+                  Service:
+                    - "lambda.amazonaws.com"
+                Action:
+                  - "sts:AssumeRole"
+          Path: /
+          Policies:
+              -
+                PolicyName:
+                  Fn::Sub: ${AWS::StackName}-PostmanLambdaTestRunnerRole-Policy
+                PolicyDocument:
+                  Version: "2012-10-17"
+                  Statement:
+                    -
+                      Effect: "Allow"
+                      Action:
+                        - "logs:CreateLogGroup"
+                        - "logs:CreateLogStream"
+                        - "logs:PutLogEvents"
+                      Resource:
+                        - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
 
   CodePipelineArtifactBucket:
     DeletionPolicy: Delete
@@ -137,12 +215,12 @@ Resources:
           Value:
             Fn::Sub: ${AWS::StackName}-codepipeline-artifact-bucket
 
-  NewmanCodeBuildProject:
+  CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Name:
         Fn::Sub: ${AWS::StackName}-CodeBuildProject
-      Description: NewmanCodeBuildProject build project
+      Description: CodeBuildProject build project
       ServiceRole:
         Fn::GetAtt: [ CodeBuildServiceRole, Arn ]
       Artifacts:
@@ -155,6 +233,7 @@ Resources:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/nodejs:8.11.0
+      #TODO: replace hard code
       Source:
         Location:
           Fn::Sub: https://github.com/juan4aws/cicdnewman
@@ -168,6 +247,8 @@ Resources:
 
   NewmanCodePipeline:
     Type: "AWS::CodePipeline::Pipeline"
+    DependsOn:
+      - CodeBuildProject
     Properties:
       Name:
         Fn::Sub: ${AWS::StackName}-CodePipeline
@@ -184,11 +265,11 @@ Resources:
                 Version: 1
                 Provider: GitHub
               Configuration:
-                Owner: juan4aws
+                Owner: !Ref GitHubUser
                 PollForSourceChanges: false
                 Repo: !Ref GitHubRepositoryName
-                Branch: master
-                OAuthToken: !Ref GitHubRepositoryToken
+                Branch: !Ref GitHubBranch
+                OAuthToken: !Ref GitHubToken
               InputArtifacts: []
               OutputArtifacts:
                 - Name: !Join
@@ -206,7 +287,7 @@ Resources:
                 Version: 1
                 Provider: CodeBuild
               Configuration:
-                ProjectName: !Ref NewmanCodeBuildProject
+                ProjectName: !Ref CodeBuildProject
               InputArtifacts:
                 - Name: !Join
                     - '-'
@@ -220,3 +301,66 @@ Resources:
               RunOrder: 1
               Name: BuildProject
           Name: Build
+
+
+        - Actions:
+            - ActionTypeId:
+                Owner: AWS
+                Category: Deploy
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                TemplatePath: !Join
+                  - ''
+                  - - !Ref ProjectId
+                    - '-BuildArtifact'
+                    - '::01api/postman-newman-api-output.yaml'
+                ActionMode: CHANGE_SET_REPLACE
+                Capabilities: CAPABILITY_IAM
+                ChangeSetName: pipeline-changeset
+                RoleArn: !GetAtt
+                  - CloudFormationTrustRole
+                  - Arn
+                StackName: !Join
+                  - '-'
+                  - - newmanapi
+                    - !Ref ProjectId
+              InputArtifacts:
+                - Name: !Join
+                    - '-'
+                    - - !Ref ProjectId
+                      - BuildArtifact
+              OutputArtifacts: []
+              RunOrder: 1
+              Name: GenerateChangeSet
+            - ActionTypeId:
+                Owner: AWS
+                Category: Deploy
+                Version: 1
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CHANGE_SET_EXECUTE
+                ChangeSetName: pipeline-changeset
+                StackName: !Join
+                  - '-'
+                  - - newmanapi
+                    - !Ref ProjectId
+              InputArtifacts: []
+              OutputArtifacts: []
+              RunOrder: 2
+              Name: ExecuteChangeSet
+          Name: Deploy
+        # https://docs.aws.amazon.com/codepipeline/latest/userguide/actions-invoke-lambda-function.html
+        - Actions:
+            - ActionTypeId:
+                Owner: AWS
+                Category: Invoke
+                Version: 1
+                Provider: Lambda
+              Configuration:
+                FunctionName: !Ref TestRunnerLambdaFunctionName
+              InputArtifacts: []
+              OutputArtifacts: []
+              RunOrder: 1
+              Name: LambdaRunnerTest
+          Name: ExecuteTests

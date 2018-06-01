@@ -1,7 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Resources:
-  HealthFunction:
+  # simple function one
+  FunctionOne:
     Type: AWS::Serverless::Function
     Properties:
       Handler: function-one.handler

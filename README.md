@@ -1,14 +1,14 @@
 # About
 
-This post will demonstrate use of code pipeline to build, deploy and functionally test an API. A stage within code pipeline will execute a functional test suite created with Postman. Results are made available for analysis with Athena and Quicksight
+This post will demonstrate use of code pipeline to build, deploy and functionally test an API. A stage within code pipeline will execute a functional test suite created with Postman. Results are made available for analysis with Athena and Quicksight.
 
 ![Postman Collection](readme_images/0_1_automated-api-testing.png)
 
-# 01 - API deployment
+# 01 - API deployment  
 
 First we will deploy a very simple api to test using Postman. And I do mean simple: 2 endpoints backed by lambda to test simple get methods. This should be enough to illustrate the concept and be the basis for your own tests.
 
-* First fork the exisiting repo in github into your own account and check out the forked repo to your local dev environment. 
+* First fork the exisiting github repo into your own account and check out the forked repo to your local dev environment. 
 * Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as you will see in subsequent instructions and screen shots. You will need to create your own and reference it appropriatley.
 * Using our command line navigate to directory (01api) containing the source code for our api and yaml template used to package and deploy our api. 
 * From there you will execute the following commands to deploy the api. 
