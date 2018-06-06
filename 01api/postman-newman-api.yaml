@@ -28,3 +28,11 @@ Resources:
             Properties:
               Path: /two
               Method: get
+
+Outputs:
+
+    PostmanApi:
+      Description: "Root API endpoint URL for Prod stage"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+      Export:
+        Name: PostmanApiRoot

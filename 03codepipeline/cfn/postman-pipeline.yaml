@@ -151,6 +151,7 @@ Resources:
                       Resource:
                         - "*"
 
+  # TODO: policy scoping
   CloudFormationTrustRole:
     Type: 'AWS::IAM::Role'
     Description: Creating service role in IAM for AWS CloudFormation
@@ -168,38 +169,6 @@ Resources:
               Service:
                 - cloudformation.amazonaws.com
 
-  PostmanLambdaTestRunnerRole:
-      Type: AWS::IAM::Role
-      Properties:
-          RoleName:
-            Fn::Sub: S3UploadLambdaRole-${AWS::StackName}
-          AssumeRolePolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              -
-                Effect: "Allow"
-                Principal:
-                  Service:
-                    - "lambda.amazonaws.com"
-                Action:
-                  - "sts:AssumeRole"
-          Path: /
-          Policies:
-              -
-                PolicyName:
-                  Fn::Sub: ${AWS::StackName}-PostmanLambdaTestRunnerRole-Policy
-                PolicyDocument:
-                  Version: "2012-10-17"
-                  Statement:
-                    -
-                      Effect: "Allow"
-                      Action:
-                        - "logs:CreateLogGroup"
-                        - "logs:CreateLogStream"
-                        - "logs:PutLogEvents"
-                      Resource:
-                        - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*
-
   CodePipelineArtifactBucket:
     DeletionPolicy: Delete
     Type: 'AWS::S3::Bucket'
@@ -215,6 +184,7 @@ Resources:
           Value:
             Fn::Sub: ${AWS::StackName}-codepipeline-artifact-bucket
 
+  #code build is used to create the api deployment package (see buildspec.yml)
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -233,10 +203,13 @@ Resources:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/nodejs:8.11.0
-      #TODO: replace hard code
       Source:
-        Location:
-          Fn::Sub: https://github.com/juan4aws/cicdnewman
+        Location: !Join
+          - ''
+          - - 'https://github.com/'
+            - !Ref GitHubUser
+            - '/'
+            - !Ref GitHubRepositoryName
         Type:  GITHUB
         BuildSpec: 01api/buildspec.yml
       TimeoutInMinutes: 10
@@ -245,7 +218,7 @@ Resources:
           Value:
             Fn::Sub: ${AWS::StackName}-CodeBuildProject
 
-  NewmanCodePipeline:
+  PostmanCodePipeline:
     Type: "AWS::CodePipeline::Pipeline"
     DependsOn:
       - CodeBuildProject
@@ -258,8 +231,10 @@ Resources:
         Type: S3
         Location: !Ref CodePipelineArtifactBucket
       Stages:
-        - Actions:
-            - ActionTypeId:
+        - Name: Source
+          Actions:
+            - Name: ApplicationSource
+              ActionTypeId:
                 Owner: ThirdParty
                 Category: Source
                 Version: 1
@@ -277,11 +252,11 @@ Resources:
                     - - !Ref ProjectId
                       - SourceArtifact
               RunOrder: 1
-              Name: ApplicationSource
-          Name: Source
 
-        - Actions:
-            - ActionTypeId:
+        - Name: Build
+          Actions:
+            - Name: BuildProject
+              ActionTypeId:
                 Owner: AWS
                 Category: Build
                 Version: 1
@@ -299,12 +274,11 @@ Resources:
                     - - !Ref ProjectId
                       - BuildArtifact
               RunOrder: 1
-              Name: BuildProject
-          Name: Build
 
-
-        - Actions:
-            - ActionTypeId:
+        - Name: Deploy
+          Actions:
+            - Name: GenerateChangeSet
+              ActionTypeId:
                 Owner: AWS
                 Category: Deploy
                 Version: 1
@@ -332,8 +306,9 @@ Resources:
                       - BuildArtifact
               OutputArtifacts: []
               RunOrder: 1
-              Name: GenerateChangeSet
-            - ActionTypeId:
+
+            - Name: ExecuteChangeSet
+              ActionTypeId:
                 Owner: AWS
                 Category: Deploy
                 Version: 1
@@ -348,11 +323,12 @@ Resources:
               InputArtifacts: []
               OutputArtifacts: []
               RunOrder: 2
-              Name: ExecuteChangeSet
-          Name: Deploy
+
         # https://docs.aws.amazon.com/codepipeline/latest/userguide/actions-invoke-lambda-function.html
-        - Actions:
-            - ActionTypeId:
+        - Name: ExecuteTests
+          Actions:
+            - Name: LambdaRunnerTest
+              ActionTypeId:
                 Owner: AWS
                 Category: Invoke
                 Version: 1
@@ -362,5 +338,3 @@ Resources:
               InputArtifacts: []
               OutputArtifacts: []
               RunOrder: 1
-              Name: LambdaRunnerTest
-          Name: ExecuteTests
