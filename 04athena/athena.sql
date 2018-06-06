@@ -1,51 +1,3 @@
--- https://docs.aws.amazon.com/athena/latest/ug/csv.html
-
-
--- create external table
--- out test results are in csv
---
-CREATE EXTERNAL TABLE myopencsvtable (
-   iterations_total int,
-   items_total int,
-   scripts_total int
-)
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-WITH SERDEPROPERTIES (
-   'separatorChar' = ',',
-   'quoteChar' = '\"',
-   'escapeChar' = '\\'
-   )
-STORED AS TEXTFILE
-LOCATION 's3://athena-test-input/';
-
-
-
-
-CREATE EXTERNAL TABLE impressions (
-    requestbegintime string,
-    adid string,
-    impressionid string,
-    referrer string,
-    useragent string,
-    usercookie string,
-    ip string,
-    number string,
-    processid string,
-    browsercookie string,
-    requestendtime string,
-
-    threadid string,
-    hostname string,
-    sessionid string
-)
-ROW FORMAT  serde 'org.apache.hive.hcatalog.data.JsonSerDe'
-with serdeproperties ( 'paths'='requestbegintime, adid, impressionid, referrer, useragent, usercookie, ip' )
-LOCATION 's3://myregion.elasticmapreduce/samples/hive-ads/tables/impressions';
-
-
-
-
-
 CREATE EXTERNAL TABLE `test_results`(
   `iterations_total` int ,
   `iterations_pending` int ,
@@ -97,8 +49,3 @@ TBLPROPERTIES (
   'recordCount'='1',
   'sizeKey'='628',
   'typeOfData'='file')
-
-
-
-
--- count of failed tests
