@@ -8,7 +8,7 @@ Resources:
       Runtime: nodejs6.10
       Timeout: 60
       MemorySize: 512
-      FunctionName: PostmanCodePipelineTestRunner
+      FunctionName: PostmanTestRunner3
       Policies:
         - Version: '2012-10-17' # Policy Document
           Statement:
@@ -24,4 +24,10 @@ Resources:
               Action:
                 - codepipeline:PutJobSuccessResult
                 - codepipeline:PutJobSuccessFailure
+              Resource: "*"
+        - Version: '2012-10-17' # Policy Document
+          Statement:
+            - Effect: Allow
+              Action:
+                - cloudformation:ListExports
               Resource: "*"

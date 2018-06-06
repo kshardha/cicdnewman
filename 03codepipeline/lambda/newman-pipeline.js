@@ -1,7 +1,11 @@
 let newman = require('newman'); // require newman in your project
 let AWS = require('aws-sdk');
 let async = require("async");
+
+//TODO: apiVersions?
 let s3 = new AWS.S3({apiVersion: '2006-03-01'});
+let cloudformation = new AWS.CloudFormation({apiVersion: '2010-05-15'});
+
 let fs = require('fs');
 let dateFormat = require('dateformat');
 
@@ -16,6 +20,8 @@ const jp = require('jsonpath');
  * flatten a json structure
  */
 const flatten = require('flat');
+
+let postmanAPIRootFromCFNExport = {};
 
 /**
  * This lambda function is called from code pipeline
@@ -35,7 +41,7 @@ const flatten = require('flat');
  */
 exports.handler = function(event, context) {
 
-    console.log(JSON.stringify(event));
+    console.log("Event from Code Pipeline --> " + JSON.stringify(event));
 
     let codepipeline = new AWS.CodePipeline();
 
@@ -78,20 +84,19 @@ exports.handler = function(event, context) {
      */
     let getPostmanCollection = function(callback){
 
-        console.log(' >>>>> fetching collection');
-
+        //TODO: environment variables
         let params = {
             Bucket: 'postman-newman',
             Key: 'postman-env-files/PostmanNewmanAPI.postman_collection.json'
         };
 
-        console.log(JSON.stringify(params));
+        console.log("fetching collection " + JSON.stringify(params));
 
         let file = fs.createWriteStream('/tmp/newman.s3.json');
 
         file.on('close', function(){
 
-            console.log(' >>>>> done fetching collection');  //prints, file created
+            console.log('done fetching postman collection from S3');  //prints, file created
 
             callback(null, 'one'); //async call back
         });
@@ -111,6 +116,12 @@ exports.handler = function(event, context) {
      */
     let getPostmanEnvironment = function(callback){
 
+        if(fs.existsSync('/tmp/postman.s3.environment.json')) {
+            console.log("/tmp/postman.s3.environment.json found - deleting it.");
+            fs.unlinkSync('/tmp/postman.s3.environment.json');
+        }
+
+        //TODO: environment variables
         let params = {
             Bucket: 'postman-newman',
             Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json'
@@ -118,19 +129,88 @@ exports.handler = function(event, context) {
 
         let file = fs.createWriteStream('/tmp/postman.s3.environment.json');
 
-        file.on('close', function(){
-
-            console.log('done fetching environment');  //prints, file created
-
-            callback(null, 'one'); //async call back
-        });
-
-
         s3.getObject(params).createReadStream().on('error', function(err){
             console.log(err);
         }).pipe(file);
 
+        //invoke callback on close
+        file.on('close', function(){
+
+            let obj = JSON.parse(fs.readFileSync('/tmp/postman.s3.environment.json', 'utf8'));
+
+            console.log('done fetching postman environment file from S3 - ' + JSON.stringify(obj, null, '\t'));
+
+            callback(null, 'done'); //async call back
+        });
+
     };
+
+    /**
+     *
+     * @param callback
+     */
+    let getCloudFormationExportValue = function(callback) {
+
+        cloudformation.listExports({}, function(err, data) {
+
+            if (err) {
+                postmanAPIRootFromCFNExport = { Error: 'listStackResources call failed' };
+                console.log(postmanAPIRootFromCFNExport.Error + ':\n', err);
+
+            } else {
+                data.Exports.forEach(function (output) {
+                    if(output.Name.toUpperCase() === "POSTMANAPIROOT" ){
+                        postmanAPIRootFromCFNExport['PostmanAPIRoot'] = output.Value;
+                    }
+
+                });
+            }
+
+            console.log('done fetching cloud formation exported api endpoint: ' + JSON.stringify(postmanAPIRootFromCFNExport) );
+
+            callback(null, 'done'); //async call back
+        });
+
+    };
+
+    /**
+     *
+     * @param callback
+     */
+    let updateAPIEndpointInEnvironmentFile = function(callback) {
+
+        let obj = JSON.parse(fs.readFileSync('/tmp/postman.s3.environment.json', 'utf8'));
+
+        obj['values'] = [
+            {
+                'key': 'apigw-root',
+                'value': postmanAPIRootFromCFNExport.PostmanAPIRoot,
+                'enabled': true,
+                'type': 'text'
+            }
+        ];
+
+        let base64data = new Buffer(JSON.stringify(obj, null, '\t'), 'binary');
+
+        //TODO: use environment variable
+        s3.putObject({
+            Bucket: 'postman-newman',
+            Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json',
+            Body: base64data,
+            ACL: 'public-read'
+        },function (err, data) {
+
+            if (err){
+                console.log(err, err.stack);
+            }else{
+                console.log('done updating environment file with api endpoint - ' + JSON.stringify(obj, null, '\t'));
+            }
+
+            callback(null, 'done'); //async call back
+        });
+
+    };
+
 
     /**
      * Executes the postman collection tests and stores in /tmp folder
@@ -138,7 +218,9 @@ exports.handler = function(event, context) {
      */
     let executePostmanCollection = function(callback){
 
-        console.log(' >>>>> running API Tests');
+        console.log('running postman collection tests using the following environment config: --> ');
+        let obj = JSON.parse(fs.readFileSync('/tmp/postman.s3.environment.json', 'utf8'));
+        console.log(JSON.stringify(obj, null, '\t'));
 
         // call newman.run to pass `options` object and wait for callback
         newman.run({
@@ -152,7 +234,7 @@ exports.handler = function(event, context) {
             iterationCount: 1
         }).on('start', function (err, args) { // on start of run, log to console
 
-            console.log('running a collection...');
+            console.log('executing collection...');
 
         }).on('done', function (err, summary) {
 
@@ -209,7 +291,7 @@ exports.handler = function(event, context) {
      */
     let publishJSONResultsToS3 = function(callback){
 
-        console.log(' >>>>> publishing results to S3');
+        console.log('publishing results to S3');
 
         let keyDateTime = dateFormat(new Date(), "yyyymmdd_HMMss");
         let objectKey = 'test-results/'.concat(keyDateTime,'.json');
@@ -219,6 +301,7 @@ exports.handler = function(event, context) {
 
             let base64data = new Buffer(data, 'binary');
 
+            //TODO: use environment variable
             s3.putObject({
                 Bucket: 'postman-newman',
                 Key: objectKey,
@@ -226,11 +309,9 @@ exports.handler = function(event, context) {
                 ACL: 'public-read'
             },function (resp) {
 
-                console.log(' >>>>> arguments --> ' + arguments);
+                console.log('Successfully uploaded results to S3.');
 
-                console.log(' >>>>> Successfully uploaded results.');
-
-                callback(null, 'three'); //async call back
+                callback(null, 'done'); //async call back
             });
 
         });
@@ -260,11 +341,28 @@ exports.handler = function(event, context) {
 
     async.series(
         [
+            //retrieve the postman collection file from S3 bucket
             getPostmanCollection,
+
+            //retrieve the postman environment file from S3 bucket
             getPostmanEnvironment,
+
+            //get the api root value from cloud formation export
+            getCloudFormationExportValue,
+
+            //update api endpoint in config file in S3 with value from stack export
+            updateAPIEndpointInEnvironmentFile,
+
+            //get updated environment file from S3
+            getPostmanEnvironment,
+
+            //execute the collection test run using newman API
             executePostmanCollection,
+
             preprocessPostmanResults,
+
             publishJSONResultsToS3,
+
             notifyCodePipeLine
         ]
     );

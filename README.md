@@ -10,7 +10,7 @@ First we will deploy a very simple api to test using Postman. And I do mean simp
 
 * First fork the exisiting github repo into your own account and check out the forked repo to your local dev environment. 
 * Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as you will see in subsequent instructions and screen shots. You will need to create your own and reference it appropriatley.
-* Using our command line navigate to directory (01api) containing the source code for our api and yaml template used to package and deploy our api. 
+* Using your command line navigate to directory (01api) containing the source code for our api and yaml template used to package and deploy our api. 
 * From there you will execute the following commands to deploy the api. 
   * NOTE: rememeber to specify your own region and s3 bucket.
 
