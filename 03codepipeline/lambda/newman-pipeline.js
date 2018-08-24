@@ -86,7 +86,7 @@ exports.handler = function(event, context) {
 
         //TODO: environment variables
         let params = {
-            Bucket: 'postman-newman',
+            Bucket: process.env.POSTMAN_BUCKET_ROOT,
             Key: 'postman-env-files/PostmanNewmanAPI.postman_collection.json'
         };
 
@@ -123,9 +123,11 @@ exports.handler = function(event, context) {
 
         //TODO: environment variables
         let params = {
-            Bucket: 'postman-newman',
+            Bucket: process.env.POSTMAN_BUCKET_ROOT,
             Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json'
         };
+
+        console.log("fetching environment " + JSON.stringify(params));
 
         let file = fs.createWriteStream('/tmp/postman.s3.environment.json');
 
@@ -179,6 +181,8 @@ exports.handler = function(event, context) {
      */
     let updateAPIEndpointInEnvironmentFile = function(callback) {
 
+        console.log('Updating environment file with API Endpoint');
+
         let obj = JSON.parse(fs.readFileSync('/tmp/postman.s3.environment.json', 'utf8'));
 
         obj['values'] = [
@@ -190,18 +194,20 @@ exports.handler = function(event, context) {
             }
         ];
 
+        console.log("Updated env variables: " + JSON.stringify(obj, null, '\t'));
+
         let base64data = new Buffer(JSON.stringify(obj, null, '\t'), 'binary');
 
         //TODO: use environment variable
         s3.putObject({
-            Bucket: 'postman-newman',
+            Bucket: process.env.POSTMAN_BUCKET_ROOT,
             Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json',
             Body: base64data,
             ACL: 'public-read'
         },function (err, data) {
 
             if (err){
-                console.log(err, err.stack);
+                console.log("** Error: " + err, err.stack);
             }else{
                 console.log('done updating environment file with api endpoint - ' + JSON.stringify(obj, null, '\t'));
             }
@@ -303,7 +309,7 @@ exports.handler = function(event, context) {
 
             //TODO: use environment variable
             s3.putObject({
-                Bucket: 'postman-newman',
+                Bucket: process.env.POSTMAN_BUCKET_ROOT,
                 Key: objectKey,
                 Body: base64data,
                 ACL: 'public-read'

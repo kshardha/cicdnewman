@@ -4,21 +4,24 @@ This post will demonstrate use of code pipeline to build, deploy and functionall
 
 ![Postman Collection](readme_images/0_1_automated-api-testing.png)
 
-# 01 - API deployment  
+# 01 - API deployment
 
 First we will deploy a very simple api to test using Postman. And I do mean simple: 2 endpoints backed by lambda to test simple get methods. This should be enough to illustrate the concept and be the basis for your own tests.
 
-* First fork the exisiting github repo into your own account and check out the forked repo to your local dev environment. 
-* Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as you will see in subsequent instructions and screen shots. You will need to create your own and reference it appropriatley.
+* First fork the existing github repo into your own account and check out the forked repo to your local dev environment. 
+
+* Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as you will see in subsequent instructions and screen shots. **You will need to create your own and reference it appropriately.**
+
 * Using your command line navigate to directory (01api) containing the source code for our api and yaml template used to package and deploy our api. 
+
 * From there you will execute the following commands to deploy the api. 
-  * NOTE: rememeber to specify your own region and s3 bucket.
+  * NOTE: remember to specify your own region and s3 bucket.
 
   ```
   aws cloudformation package \
   --region us-east-1 \
   --template-file postman-newman-api.yaml \
-  --s3-bucket postman-newman \
+  --s3-bucket <your_bucket> \
   --s3-prefix api-code \
   --output-template-file postman-newman-api-output.yaml
   ```
@@ -49,22 +52,21 @@ In this section we will use the Postman client and the CLI to test our api and m
 
 #### via the postman client
 
-* create a new collection in postman and name it PostmanNewmanAPI
+* Create a new collection in postman and name it PostmanNewmanAPI
 
     <details><summary>Screenshot: Postman Collection</summary><p>
-
+    
     ![Postman Collection](readme_images/2_1_postman.png)
-
+    
     </p></details><p/>
-
-
+    
     <details><summary>Screenshot: Postman Empty Collection</summary><p>
-
+    
     ![Postman Empty Collection](readme_images/2_2_postman_empty_collection.png)
-
+    
     </p></details><p/>
 
-* create an environment configuration called PostmanNewmanEnvironment 
+* Create an environment configuration called PostmanNewmanEnvironment 
 
     <details><summary>Screenshot: Postman Environment</summary><p>
 
@@ -73,7 +75,7 @@ In this section we will use the Postman client and the CLI to test our api and m
     </p></details><p/>
 
 
-  * add your api gateway url. Key="apigw-root" Value = <api gateway root url from console\>
+  * Add your api gateway url. Key="apigw-root" Value = <api gateway root url from console\>
 
 
     <details><summary>Screenshot: Getting API Gateway URL</summary><p>
@@ -89,22 +91,25 @@ In this section we will use the Postman client and the CLI to test our api and m
 
     </p></details><p/>
 
-* create your api request to function one. 
-  * create a get request to function one using your environment variable, i.e. {{apigw-root}}/one
+* Create your api request to function one. 
+  * Create a get request to function one using your environment variable, i.e. {{apigw-root}}/one
   * Make sure to select the created environment configuration (PostmanNewmanEnvironmnet) from the environment drop down - see screen shots.
-  * You can execute this call now and observe the response from API Gateway
-    * in the "Body" pane you should have a response similar to:
-        {
-            "message": "Successful response from function 2 - v1.0"
-        }
-    * This response is coded in your lambda function. We use it to validate specific text in response body in future tests.
-    * In the "Headers" pane you can see the headers returned by API Gateway.
+  * You can execute this call now by pressing Send (blue button) and observe the response from API Gateway
+
     
       <details><summary>Screenshot: Single Get Request</summary><p>
 
       ![Environment Variables](readme_images/2_5_single_endpoint_request.png)
 
       </p></details><p/>
+
+    * in the "Body" pane you should have a response similar to:
+        {
+            "message": "Successful response from function 1 - v2.0"
+        }
+    * This response is coded in your lambda function. We use it to validate specific text in response body in future tests.
+    * In the "Headers" pane you can see the headers returned by API Gateway.
+
   * Lets save this request as part of your collection.
     * Make sure to save the request as part of your "PostmanNewmanAPI" collection.
 
@@ -114,7 +119,7 @@ In this section we will use the Postman client and the CLI to test our api and m
 
       </p></details><p/>
 
-* add the following test script under the "Tests" pane 
+* add the following test script under the "Tests" pane in Postman
   * In this particular test we are looking for a 200 response, a Content-Type header and a specific string to be included in the response body. 
 
         pm.test("Status code is 200", function () {
@@ -126,7 +131,7 @@ In this section we will use the Postman client and the CLI to test our api and m
         tests["Has Content-Type"] = contentTypeHeaderExists;
         
         pm.test("Body matches string", function () {
-            pm.expect(pm.response.text()).to.include("v1.0");
+            pm.expect(pm.response.text()).to.include("v2.0");
         });
   
   * When you execute the get request Postman will now test the response to make sure it 
@@ -155,7 +160,7 @@ NOTE: please refer to the following for newman installation instructions:
 https://www.getpostman.com/docs/v6/postman/collection_runs/command_line_integration_with_newman
 
 * cd into the "02postman" directory.
-* export both your postman collection and your postman environment into this directory (02postman) so you can run via cli. 
+* From the Postman client export both your postman collection and your postman environment into this directory (02postman) so you can run via cli - see screenshots. 
   * NOTE: select "Collection v2.1 (recommended)" when prompted
 
     <details><summary>Screenshot: Export Collection</summary><p>
@@ -178,6 +183,10 @@ https://www.getpostman.com/docs/v6/postman/collection_runs/command_line_integrat
 
     </p></details><p/>
 
+  * install the html reporter to be able to create html test result reports
+
+    `npm install -g newman-reporter-html`
+
   * execute the following command
   
 ```
@@ -192,10 +201,10 @@ You should now have a pretty good sense of what you can do with postman both man
 
 # 03 - automated api deployment with code pipeline
 
-On to our next baby step before automating postman in code pipeline. Here
+On to our next step before automating postman in code pipeline. Here
 we will show how to execute api gateway deployments using code pipeline.
 
-* go into cloud formation and delete the stack you used to create the initial API Gateway deployment.
+* go into cloud formation and delete the stack you used to create the initial API deployment - stack name should postman-newman-api-stack.
 
 * go into AWS Console --> Services --> Code Pipeline and click "Get Started"
 
@@ -291,7 +300,7 @@ we will show how to execute api gateway deployments using code pipeline.
     </p></details><p/>
 
 * At this point you should have an API that is automatically deployed anytime you commit a change to your project.
-* You can now grab the new API endpoint form the AWS API Gateway console and update your postman enviornment file to this new endpoint.
+* You can now grab the new API endpoint form the AWS API Gateway console and update your postman environment file to this new endpoint.
   * Make sure you save your new environment file.
 * You can now test your updated api via postman client and cli as we did earlier.
 
