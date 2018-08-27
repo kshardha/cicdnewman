@@ -1,27 +1,27 @@
 # About
 
-This post will demonstrate use of code pipeline to build, deploy and functionally test an API. A stage within code pipeline will execute a functional test suite created with Postman. Results are made available for analysis with Athena and Quicksight.
+This post demonstrates the use of code pipeline to build, deploy and functionally test an API. A stage within code pipeline executes a functional test suite created with Postman. Results are made available for analysis with Athena and Quicksight.
 
 ![Postman Collection](readme_images/0_1_automated-api-testing.png)
 
 # 01 - API deployment
 
-First we will deploy a very simple api to test using Postman. And I do mean simple: 2 endpoints backed by lambda to test simple get methods. This should be enough to illustrate the concept and be the basis for your own tests.
+First, we deploy a straightforward API to test using Postman. Moreover, I do mean simple: 2 endpoints backed by lambda to test simple get methods. This simple API should be enough to illustrate the concept and be the basis for your tests.
 
-* First fork the existing github repo into your own account and check out the forked repo to your local dev environment. 
+* First fork the existing GitHub repo into your account and check out the forked repo to your local dev environment. 
 
-* Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as you will see in subsequent instructions and screen shots. **You will need to create your own and reference it appropriately.**
+* Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as observed in subsequent instructions and screenshots. **You need to create your own and reference it appropriately. It is referred to as your bucket root.**
 
-* Using your command line navigate to directory (01api) containing the source code for our api and yaml template used to package and deploy our api. 
+* Using your command line navigate to the directory (01api) containing the source code for our API and yaml template used to package and deploy our API. 
 
-* From there you will execute the following commands to deploy the api. 
-  * NOTE: remember to specify your own region and s3 bucket.
+* From there you execute the following commands to deploy the API. 
+  * NOTE: remember to specify your region and S3 bucket.
 
   ```
   aws cloudformation package \
   --region us-east-1 \
   --template-file postman-newman-api.yaml \
-  --s3-bucket <your_bucket> \
+  --s3-bucket <your_bucket_root> \
   --s3-prefix api-code \
   --output-template-file postman-newman-api-output.yaml
   ```
@@ -42,13 +42,13 @@ First we will deploy a very simple api to test using Postman. And I do mean simp
 
   </p></details><p/>
 
-* When your stack creation is complete you will have an api to test.
-* Take a look at the API Gateway and Lambda consoles to see what the cloudformation templates created.
+* When your stack creation is complete you have an API to test.
+* Take a look at the API Gateway and Lambda consoles to see what the cloud formation templates created.
 
 
-# 02 - API testing with Postman client and cli
+# 02 - API testing with Postman client and CLI
 
-In this section we will use the Postman client and the CLI to test our api and make sure it meets our functional requirements.
+In this section, we use the Postman client and the CLI to test our API and make sure it meets our functional requirements.
 
 #### via the postman client
 
@@ -65,6 +65,8 @@ In this section we will use the Postman client and the CLI to test our api and m
     ![Postman Empty Collection](readme_images/2_2_postman_empty_collection.png)
     
     </p></details><p/>
+
+
 
 * Create an environment configuration called PostmanNewmanEnvironment 
 
@@ -91,9 +93,9 @@ In this section we will use the Postman client and the CLI to test our api and m
 
     </p></details><p/>
 
-* Create your api request to function one. 
-  * Create a get request to function one using your environment variable, i.e. {{apigw-root}}/one
-  * Make sure to select the created environment configuration (PostmanNewmanEnvironmnet) from the environment drop down - see screen shots.
+* Create your API request to function one. 
+  * Create a get request to function one using your environment variable, i.e., {{apigw-root}}/one
+  * Make sure to select the created environment configuration (PostmanNewmanEnvironmnet) from the environment drop down - see screenshots.
   * You can execute this call now by pressing Send (blue button) and observe the response from API Gateway
 
     
@@ -110,7 +112,7 @@ In this section we will use the Postman client and the CLI to test our api and m
     * This response is coded in your lambda function. We use it to validate specific text in response body in future tests.
     * In the "Headers" pane you can see the headers returned by API Gateway.
 
-  * Lets save this request as part of your collection.
+  * Let's save this request as part of your collection.
     * Make sure to save the request as part of your "PostmanNewmanAPI" collection.
 
       <details><summary>Screenshot: Save Request</summary><p>
@@ -120,7 +122,7 @@ In this section we will use the Postman client and the CLI to test our api and m
       </p></details><p/>
 
 * add the following test script under the "Tests" pane in Postman
-  * In this particular test we are looking for a 200 response, a Content-Type header and a specific string to be included in the response body. 
+  * In this particular test we are looking for a 200 response, a Content-Type header and a specific string to in the response body. 
 
         pm.test("Status code is 200", function () {
             pm.response.to.have.status(200);
@@ -134,7 +136,7 @@ In this section we will use the Postman client and the CLI to test our api and m
             pm.expect(pm.response.text()).to.include("v2.0");
         });
   
-  * When you execute the get request Postman will now test the response to make sure it 
+  * When you execute the get request Postman tests the response to make sure it 
   contains the correct response code, header and body content as defined in our test script.
 
       <details><summary>Screenshot: Testing</summary><p>
@@ -143,7 +145,7 @@ In this section we will use the Postman client and the CLI to test our api and m
 
       </p></details><p/>
 
-  * Repeat these steps to make and save single get request to the second endpoint, i.e. {{apigw-root}}/two
+  * Repeat these steps to make and save single get request to the second endpoint, i.e., {{apigw-root}}/two
   * Your Postman Collection should now be saved with 2 get requests for 2 endpoints.
 
       <details><summary>Screenshot: Postman Collection with 2 get requests</summary><p>
@@ -152,15 +154,15 @@ In this section we will use the Postman client and the CLI to test our api and m
 
       </p></details><p/>
 
-You now have an api with 2 endpoints and a way to test those endpoints for specific functional requirements using Postman. We will now move on to execute via cli.
+You now have an API with 2 endpoints and a way to test those endpoints for specific functional requirements using Postman. IN the next section we execute the same tests using the CLI.
 
 #### via the newman cli
 
-NOTE: please refer to the following for newman installation instructions: 
+NOTE: please refer to the following for Newman installation instructions: 
 https://www.getpostman.com/docs/v6/postman/collection_runs/command_line_integration_with_newman
 
 * cd into the "02postman" directory.
-* From the Postman client export both your postman collection and your postman environment into this directory (02postman) so you can run via cli - see screenshots. 
+* From the Postman client export both your postman collection and your postman environment into this directory (02postman) so you can run via CLI - see screenshots. 
   * NOTE: select "Collection v2.1 (recommended)" when prompted
 
     <details><summary>Screenshot: Export Collection</summary><p>
@@ -183,7 +185,7 @@ https://www.getpostman.com/docs/v6/postman/collection_runs/command_line_integrat
 
     </p></details><p/>
 
-  * install the html reporter to be able to create html test result reports
+  * install the HTML reporter to be able to create HTML test result reports
 
     `npm install -g newman-reporter-html`
 
@@ -195,196 +197,48 @@ newman run PostmanNewmanAPI.postman_collection.json \
 -r cli,json,html 
 ```
   * you should see a new directory "newman" containing both json and html reports with test results. 
-  * Notice that results where also shown via the cli since we asked for cli output via "-r cli,json,html"
+  * Notice that results were also shown via the cli since we asked for cli output via "-r cli,json,html."
 
-You should now have a pretty good sense of what you can do with postman both manually via the client and via the command line. Later on we will also execute these tests programmatically allowing us to automate test execution via code pipeline
+You should now have a pretty good sense of what you can do with Postman both manually via the Postman client and the command line using Newman. In the next section, we automate the deployment of our API and automate the execution of these tests using Code Pipeline.
 
-# 03 - automated api deployment with code pipeline
+# 03 - Automated API deployment and testing with AWS Code Pipeline
 
-On to our next step before automating postman in code pipeline. Here
-we will show how to execute api gateway deployments using code pipeline.
+Here we show how to execute API gateway deployments using code pipeline. Our pipeline also includes a stage that executes the Postman tests that we created in section 2.
 
-* go into cloud formation and delete the stack you used to create the initial API deployment - stack name should postman-newman-api-stack.
+* go into cloud formation console and delete the stack you used to create the initial API deployment in section 01 - stack name should postman-newman-api-stack.
 
-* go into AWS Console --> Services --> Code Pipeline and click "Get Started"
+* cd into 03pipeline/lambda directory
 
-* Create pipeline: pipeline name
+Take a look at the code in newman-pipeline.js. This code represents the lambda function that executes newman to run tests defined in our exported postman collection and environment file. 
 
-    <details><summary>Screenshot: Create Pipeline step 1</summary><p>
+* Install required dependencies
+  * In your cli execute the following: `npm install`
 
-    ![Export Env](readme_images/3_3_pipeline_create.png)
+* lets zip this lambda function and store it in S3 to be used by the following cloud formation template that deploys this function as part of our pipeline that deploys our API and tests it using postman.
+  * run `zip -r lambda-archive.zip ./*` inside of the lambda folder 
+  * create a folder in your bucket root (S3 bucket created in step 1) named newman-lambda-runner. 
+  * upload lambda-archive.zip to the folder you just created.
 
-    </p></details><p/>
+* Store your postman environment and collection files in S3.
+  * Create a folder in your bucket root (S3 bucket created in step 1) named postman-env-files
+  * Copy your postman environment and collection files into this bucket.
 
-* Create pipeline: select source repo.
-  * For our source repo we will point to our github repository. You will be prompted to connect to your github account and select your repo.
+* Deploy and test your API with Code Pipeline.
+  - enter cloudformation console and deploy cfn/postman-pipeline.yaml
+    + make sure to enter the bucket root you have been using to store your lambda code, postman files, and related files.
 
-    <details><summary>Screenshot: Create Pipeline step 2 - select source repo</summary><p>
-
-    ![Export Env](readme_images/3_4_pipeline_create_2.png)
-
-    </p></details><p/>
-
-* Create pipeline: create build project.
-
-    <details><summary>Screenshot: Create Pipeline step 3 - build project</summary><p>
-
-    ![Export Env](readme_images/3_5_pipeline_create_3.png)
-
-    </p></details><p/>
-
-* after pressing "Save build project" you will see the following scree shot where you will click on "View project details" to open the code build project details page.
-    <details><summary>Screenshot: Create Pipeline step 3 - saved build project</summary><p>
-
-    ![Export Env](readme_images/3_6_pipeline_build_saved.png)
-
-    </p></details><p/>
-
-* A new browser tab will open showing the code build project page. Press "Edit Project" button to edit the build project details.
-* In the "Environment: How to build" section press "Update build specification" in order to edit the "Buildspec name" setting. Update "Buildspec name" to "01api/buildspec.yml" to reflect the location of our buildspec file - see screen shot below.
-
-    <details><summary>Screenshot: Create Pipeline step 3 - edit build project</summary><p>
-
-    ![Export Env](readme_images/3_8_pipeline_build_edit.png)
-
-    </p></details><p/>
-
-* Update the service role used by this code build project by adding an inline policy to allow access to your S3 bucket. Without this permission code build will not be able to store builds in S3 and the pipeline will fail.
-
-    <details><summary>IAM Policy: Allow Code Build access to your S3 bucket</summary><p>
-    
-      ```
-      {
-          "Version": "2012-10-17",
-          "Statement": [
-              {
-                  "Effect": "Allow",
-                  "Resource": [
-                      "arn:aws:s3:::<your_bucket>*"
-                  ],
-                  "Action": [
-                      "s3:PutObject",
-                      "s3:GetObject",
-                      "s3:GetObjectVersion"
-                  ]
-              }
-          ]
-      }
-      ```
-
-    </p></details><p/>
+* View test results
+  - When the cloud formation template used to deploy your pipeline finishes, you can navigate to the Code Pipeline console to view your pipeline. 
+  - This pipeline deploys the same API you deployed in step 1.
+  - Your test results should be in your bucket root test results folder.
+    + e.g. <bucket_root>/<file_name>.json where file_name is a timestamped file e.g. 20180825_154040.json
 
 
-* We will now set up the cloud formation deployment.
+TODO: screenshots
 
-    <details><summary>Screenshot: Create Pipeline step 4 - deploy</summary><p>
+# 05 - Using Athena to query test results
 
-    ![Export Env](readme_images/3_8_pipeline_deploy.png)
-
-    </p></details><p/>
-
-* Pipeline service role (TODO)
-
-    <details><summary>Screenshot: Create Pipeline step 4 - service role</summary><p>
-
-    ![Export Env](readme_images/3_9_pipeline_service_role.png)
-
-    </p></details><p/>
-
-* Confirm and create pipline
-
-    <details><summary>Screenshot: Create Pipeline step 4 - create pipeline</summary><p>
-
-    ![Export Env](readme_images/3_10_pipeline_save_confirm.png)
-
-    </p></details><p/>
-
-* At this point you should have an API that is automatically deployed anytime you commit a change to your project.
-* You can now grab the new API endpoint form the AWS API Gateway console and update your postman environment file to this new endpoint.
-  * Make sure you save your new environment file.
-* You can now test your updated api via postman client and cli as we did earlier.
-
-TODO: Apply granular permissions according to least priv.
-
-
-# 04 - automated postman collection testing
-
-This section demonstrates how to execute postman collections via code pipeline and store our test results in S3. We will deploy a lambda function responsible for executing Postman collections.
-
-NOTE: This lambda function needs permissions to
-- allow read access to S3 bucket to get postman collection and environment files
-- allow write access to S3 bucket in order to store test results
-- ability to call codepipeline:PutJobSuccessResult to acknowledge successful execution to code pipeline.
-
-The function 
-- grabs the postman collection and environment file from an S3 bucket
-- runs the test and places results first in lambda's /tmp folder
-- publishes cleansed results to s3 bucket
-- send confirmation to code pipeline
-
-* cd into 03codepipeline/lambda folder
-* put your postman collection and environment json files in a bucket of your choosing. In my case I will add it to same bucket (postman-newman) I used to package my api lamabda functions. I will place these files in a postman-env-files subfolder. You will need to update our runner test function with these values.
-
-* Update the lambda function code (newman-pipeline.js) pointing to the bucket and key of your postman collection and environment file. You are looking for this code to update with your specific bucket and key.
-    
-  ```
-  let params = {
-      Bucket: 'postman-newman',
-      Key: 'postman-env-files/PostmanNewmanAPI.postman_collection.json'
-  };
-
-  let params = {
-      Bucket: 'postman-newman',
-      Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json'
-  };
-  ```
-
-  TODO: replace this with environment variables and instructions to update env variables.
-
-* Update the IAM policy that will be deployed with this function that allows access to S3 bukets (to get postman config and store test results) as well as make calls to code pipeline to inidcate sucess or failure. 
-  * we will update newman-lambda-runner.yaml
-  * edit the "Resource" attribute with your bucket, i.e. replace arn:aws:s3:::postman-newman* with your bucket name arn:aws:s3:::<my bucket>*
-* execute the following command to build and package this lambda function
-  ```
-  aws cloudformation package \
-  --region us-east-1 \
-  --template-file newman-lambda-runner.yaml \
-  --s3-bucket postman-newman \
-  --s3-prefix newman-lambda-runner \
-  --output-template-file newman-lambda-runner-output.yaml
-  ```
-
-* execute the following to deploy the function
-  ```
-  aws cloudformation deploy \
-  --region us-east-1 \
-  --template-file newman-lambda-runner-output.yaml \
-  --stack-name newman-lambda-function \
-  --capabilities CAPABILITY_IAM
-  ```
-
-* you will now add this function as a stage in code pipeline.
-* Go back tou your AWS Code pipeline
-  * Click "Edit" to edit your pipe line
-  * Add a new stage by clicking the lower "+ Stage" button at bottom of pipeline after the "Staging" stage.
-  * Name this added stage as "Testing".
-  * Lets add the lambda action by pressing the "+ Action" button on this stage.
-  * Take a look at screen capture to see what your screen should be displaying in addition to the attribute values for this step.
-
-    <details><summary>Screenshot: Update Pipeline step 1 - add stage</summary><p>
-
-    ![Export Env](readme_images/4_1_update_pipeline_stage.png)
-
-    </p></details><p/>
- 
-   * Press the blue "Add action" button at the bottom to add this action to your pipeline.
-   * Press "Save pipeline changes" to save your pipeline.
-   * execute your pipeline now and when complete you should have test results in your S3 bucket. 
-
-
-# 05 - Using athena to query test results
-
-* create the athena table pointing to test results bucket
+* create the Athena table pointing to test results bucket
 
     <details><summary>Code: Athena SQL</summary><p>
 
@@ -463,5 +317,3 @@ The function
 [Serverless UI Testing](https://github.com/awslabs/serverless-automated-ui-testing)
 
 [Serverless Performance Testing](https://aws.amazon.com/blogs/apn/performance-testing-in-continuous-delivery-using-aws-codepipeline-and-blazemeter/)
-
-

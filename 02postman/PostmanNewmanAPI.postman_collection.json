@@ -11,7 +11,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "d04ae3d3-4d9a-4ce1-beb7-db58be144526",
+						"id": "20140235-1f90-4ac5-a945-fad31afbca32",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -23,7 +23,7 @@
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"v2.0\");",
+							"    pm.expect(pm.response.text()).to.include(\"v1.0\");",
 							"});"
 						]
 					}
@@ -51,7 +51,7 @@
 				{
 					"listen": "test",
 					"script": {
-						"id": "b231013a-b70f-49eb-b540-0f5c7ef2484e",
+						"id": "e2c68652-66e5-4fdf-a188-0c175625fffc",
 						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
@@ -63,7 +63,7 @@
 							"tests[\"Has Content-Type\"] = contentTypeHeaderExists;",
 							"",
 							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"v2.0\");",
+							"    pm.expect(pm.response.text()).to.include(\"v1.0\");",
 							"});"
 						]
 					}

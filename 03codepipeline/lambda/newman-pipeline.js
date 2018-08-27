@@ -202,8 +202,7 @@ exports.handler = function(event, context) {
         s3.putObject({
             Bucket: process.env.POSTMAN_BUCKET_ROOT,
             Key: 'postman-env-files/PostmanNewmanEnvironment.postman_environment.json',
-            Body: base64data,
-            ACL: 'public-read'
+            Body: base64data
         },function (err, data) {
 
             if (err){

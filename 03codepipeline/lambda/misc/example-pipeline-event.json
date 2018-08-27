@@ -1,0 +1,19 @@
+{
+  "CodePipeline.job": {
+    "id": "53d42c61-1991-4516-80fa-5cf280550cfb",
+    "accountId": "1234576789123",
+    "data": {
+      "actionConfiguration": {
+        "configuration": {
+          "FunctionName": "NewmanCodePipeLineFunction1"
+        }
+      },
+      "inputArtifacts": [],
+      "outputArtifacts": [],
+      "artifactCredentials": {
+        "sessionToken": "ABC",
+        "accessKeyId": "ASIA3YB3RHGPPGPQD6EP"
+      }
+    }
+  }
+}
