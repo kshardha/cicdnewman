@@ -4,7 +4,7 @@ phases:
     commands:
       - cd 01api
       - aws cloudformation package --template-file postman-newman-api.yaml
-                                   --s3-bucket postman-newman
+                                   --s3-bucket kks-postman-newman
                                    --s3-prefix api-code
                                    --output-template-file postman-newman-api-output.yaml
 artifacts:
