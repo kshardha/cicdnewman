@@ -314,6 +314,7 @@ exports.handler = function(event, context) {
                 ACL: 'public-read'
             },function (resp) {
 
+                console.log('KKS Log:%d', resp)
                 console.log('Successfully uploaded results to S3.');
 
                 callback(null, 'done'); //async call back
