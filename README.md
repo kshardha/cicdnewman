@@ -12,6 +12,8 @@ First, we deploy a straightforward API to test using Postman. Moreover, I do mea
 
 * Create an S3 bucket to contain resources related to this project. I created a bucket called postman-newman as observed in subsequent instructions and screenshots. **You need to create your own and reference it appropriately. It is referred to as your bucket root.**
 
+* Update "aws cloudformation package" command in buildspec.yml file found at 01api->buildspec.yml to reflect your bucket name.
+
 * Using your command line navigate to the directory (01api) containing the source code for our API and yaml template used to package and deploy our API. 
 
 * From there you execute the following commands to deploy the API. 
