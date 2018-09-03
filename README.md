@@ -6,7 +6,7 @@ This post demonstrates the use of code pipeline to build, deploy and functionall
 
 # 01 - API deployment
 
-First, we deploy a straightforward API to test using Postman. Moreover, I do mean simple: 2 endpoints backed by lambda to test simple get methods. This simple API should be enough to illustrate the concept and be the basis for your tests.
+First, we deploy a straightforward API to test using Postman. The API has two endpoints backed by lambda to test simple get methods. This simple API should be enough to illustrate the concept and be the basis for your tests.
 
 * First fork the existing GitHub repo into your account and check out the forked repo to your local dev environment. In your github repo, generate a new token (Settings -> Developer settings -> Personal Access Tokens). This will be used later in section 3.
 
@@ -156,7 +156,7 @@ In this section, we use the Postman client and the CLI to test our API and make 
 
       </p></details><p/>
 
-You now have an API with 2 endpoints and a way to test those endpoints for specific functional requirements using Postman. IN the next section we execute the same tests using the CLI.
+You now have an API with 2 endpoints and a way to test those endpoints for specific functional requirements using Postman. In the next section we will execute the same tests using the CLI.
 
 #### via the newman cli
 
@@ -226,7 +226,7 @@ Take a look at the code in newman-pipeline.js. This code represents the lambda f
   * Copy your postman environment and collection files into this bucket.
 
 * Deploy and test your API with Code Pipeline.
-  - enter cloudformation console and deploy cfn/postman-pipeline.yaml
+  - enter cloudformation console and deploy cfn/postman-pipeline.yaml. Provide your github access token, obtained in section 1.
     + make sure to enter the bucket root you have been using to store your lambda code, postman files, and related files.
 
 * View test results
