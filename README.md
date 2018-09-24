@@ -238,62 +238,40 @@ Take a look at the code in newman-pipeline.js. This code represents the lambda f
 
 TODO: screenshots
 
-# 05 - Using Athena to query test results
+# 04 - Using Athena to query test results
 
-* create the Athena table pointing to test results bucket
+In this section, we will create an external table in Athena that will point to the test results folder generated in the above sections. The Athena table can be created using the query defined in 04athena/test_results_athena_table.sql. Ensure that you update following properties in the query with appropriate names.
 
-    <details><summary>Code: Athena SQL</summary><p>
+NAME_OF_ATHENA_DB, NAME_OF_ATHENA_TABLE, S3_BUCKET_NAME, TEST_RESULTS_PATH
 
-    ```sql
-      CREATE EXTERNAL TABLE `test_results`(
-        `iterations_total` int ,
-        `iterations_pending` int ,
-        `iterations_failed` int ,
-        `items_total` int ,
-        `items_pending` int ,
-        `items_failed` int ,
-        `scripts_total` int ,
-        `scripts_pending` int ,
-        `scripts_failed` int ,
-        `prerequests_total` int ,
-        `prerequests_pending` int ,
-        `prerequests_failed` int ,
-        `requests_total` int ,
-        `requests_pending` int ,
-        `requests_failed` int ,
-        `tests_total` int ,
-        `tests_pending` int ,
-        `tests_failed` int ,
-        `assertions_total` int ,
-        `assertions_pending` int ,
-        `assertions_failed` int ,
-        `testscripts_total` int ,
-        `testscripts_pending` int ,
-        `testscripts_failed` int ,
-        `prerequestscripts_total` int ,
-        `prerequestscripts_pending` int ,
-        `prerequestscripts_failed` int ,
-        `report_date` string ,
-        `report_time` string )
-      ROW FORMAT SERDE
-        'org.openx.data.jsonserde.JsonSerDe'
-      WITH SERDEPROPERTIES (
-        'paths'='assertions_failed,assertions_pending,assertions_total,items_failed,items_pending,items_total,iterations_failed,iterations_pending,iterations_total,prerequestScripts_failed,prerequestScripts_pending,prerequestScripts_total,prerequests_failed,prerequests_pending,prerequests_total,report_date,report_time,requests_failed,requests_pending,requests_total,scripts_failed,scripts_pending,scripts_total,testScripts_failed,testScripts_pending,testScripts_total,tests_failed,tests_pending,tests_total')
-      STORED AS INPUTFORMAT
-        'org.apache.hadoop.mapred.TextInputFormat'
-      OUTPUTFORMAT
-        'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-      LOCATION
-        's3://postman-newman/test-results/'
-    ```
+Once the table is created in Athena, you can run various ad-hoc queries against this table to gather meaningful data from various test results. We have provided few sample queries below:
 
-* You can now query your test results. 
+1.  Query to get test results data between specific date range
+SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
+FROM <ATHENA_TABLE_NAME>
+where date(report_date) BETWEEN date('2018-01-01') AND date('2018-08-01')
+
+2. Query to get test results data  for date range which is more than three months old and less than six months old than the current date.
+SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
+FROM <ATHENA_TABLE_NAME>
+where (date(report_date) < (current_date - interval '3' month)) AND (date(report_date) > (current_date - interval '6' month))
+
+3. Query to get test results data for a specific API using API ID.
+SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
+FROM <ATHENA_TABLE_NAME>
+where api_id = 'https://<API_ID>.execute-api.us-east-1.amazonaws.com/Prod/'
+4. Query to get test result data for failed tests
+SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
+FROM <ATHENA_TABLE_NAME>
+where cast(testscripts_failed AS INTEGER) > 0
+
+    
 
 
-# 06 Using quick sight to visualize test results.
+# 05 Using quick sight to visualize test results.
 
 
-# 07 Creating single page app to list reports
+# 06 Creating single page app to list reports
 
 
 # References
