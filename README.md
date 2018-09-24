@@ -276,6 +276,37 @@ where cast(testscripts_failed AS INTEGER) > 0
    
 # 05 Using quick sight to visualize test results.
 
+In this section, we will walk you over the steps required to configure Amazon QuickSight to create visual insights into the test results. Let's start with configuring Amazon QuickSight.
+
+* In QuickSight console, create a new data set using Athena data source. 
+* Provide data source name as  "postman_newman_quicksight_data_set".
+* Validate connection and then click "Create data source".
+* In QuickSight console, create a new data analysis.
+* Select "postman_newman_quicksight_data_set" create above and then click "Create analysis".
+
+Next, we will cover how we create few sample visuals.
+
+<p>
+ 1. For creating visual that shows how many APIs were test in a given year
+  <p>
+    * Select "Pie Chart" visual type
+    * Put api_id(Count) in Value field and report_date(YEAR) in Group/Color field
+  </p>
+</p>
+<p>
+ 2. For creating visual that shows number of test scripts per year
+  <p>
+    * Select "Pie Chart" visual type
+    * Put transcripts_failed(Average) in Value field and report_date(YEAR) in Group/Color field
+  </p>
+</p>
+<p>
+ 3. For creating visual that shows shows side-by-side analysis of Total Assertions vs Failed Assertions, every quarter:
+  <p>
+    * Select "Clustered Bar Combo Chart" visual type
+    * Put report_date(QUARTER) in X axis field, assertions_total(SUM) and assertions_failed(Sum) in Bars field.
+  </p>
+</p>
 
 # 06 Creating single page app to list reports
 
