@@ -247,27 +247,33 @@ NAME_OF_ATHENA_DB, NAME_OF_ATHENA_TABLE, S3_BUCKET_NAME, TEST_RESULTS_PATH
 Once the table is created in Athena, you can run various ad-hoc queries against this table to gather meaningful data from various test results. We have provided few sample queries below:
 
 1.  Query to get test results data between specific date range
+<p>
 SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
 FROM <ATHENA_TABLE_NAME>
 where date(report_date) BETWEEN date('2018-01-01') AND date('2018-08-01')
-
+</p>
+ 
 2. Query to get test results data  for date range which is more than three months old and less than six months old than the current date.
+ <p>
 SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
 FROM <ATHENA_TABLE_NAME>
 where (date(report_date) < (current_date - interval '3' month)) AND (date(report_date) > (current_date - interval '6' month))
-
+</p>
+ 
 3. Query to get test results data for a specific API using API ID.
+<p>
 SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
 FROM <ATHENA_TABLE_NAME>
 where api_id = 'https://<API_ID>.execute-api.us-east-1.amazonaws.com/Prod/'
+</p>
+ 
 4. Query to get test result data for failed tests
+<p>
 SELECT api_id,report_date,report_time, tests_total, tests_pending, tests_failed, testscripts_total, testscripts_pending, testscripts_failed
 FROM <ATHENA_TABLE_NAME>
 where cast(testscripts_failed AS INTEGER) > 0
-
-    
-
-
+</p>
+   
 # 05 Using quick sight to visualize test results.
 
 
